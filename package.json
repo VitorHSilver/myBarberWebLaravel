@@ -9,7 +9,7 @@
         "@inertiajs/vue3": "^2.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.0.0",
-        "@vitejs/plugin-vue": "^5.0.0",
+        "@vitejs/plugin-vue": "^5.2.1",
         "autoprefixer": "^10.4.12",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -18,7 +18,13 @@
         "tailwindcss": "^3.2.1",
         "typescript": "^5.6.3",
         "vite": "^6.0.11",
-        "vue": "^3.4.0",
+        "vue": "^3.5.13",
         "vue-tsc": "^2.0.24"
+    },
+    "dependencies": {
+        "@primeuix/themes": "^1.0.0",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.3.0",
+        "tailwindcss-animate": "^1.0.7"
     }
 }
