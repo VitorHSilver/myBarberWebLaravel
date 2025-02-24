@@ -7,6 +7,7 @@ export function useAppointmentForm() {
     const showTimeSelect = ref(false);
     const notificationError = ref(false);
     const timesSlot = ref<string[]>([]);
+    const showVideo = ref(true);
     const toast = useToast();
 
     const form = reactive({
@@ -18,8 +19,6 @@ export function useAppointmentForm() {
     });
 
     const fetchTimes = async () => {
-    console.log("tá aqui?", currentDate);
-
         try {
             const response = await fetch(
                 `http://localhost:3000/api/consults/free-times?date=${form.date}`
@@ -39,7 +38,6 @@ export function useAppointmentForm() {
     };
 
     const handleSubmit = async () => {
-        
         if (!form.name || !form.date || !form.fone || !form.hour) {
             notificationError.value = true;
             setTimeout(() => {
@@ -149,6 +147,9 @@ export function useAppointmentForm() {
                 fetchTimes();
             }
         }, 60000);
+        if (window.innerWidth < 768) {
+            showVideo.value = false;
+        }
     });
 
     return {
@@ -161,5 +162,6 @@ export function useAppointmentForm() {
         formatPhoneNumber,
         checkDate,
         cleanField,
+        showVideo
     };
 }

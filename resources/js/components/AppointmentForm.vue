@@ -71,7 +71,8 @@ const handleSubmit = async () => {
             console.log(erro);
         }
     }
-};
+}
+
 </script>
 
 <template>
@@ -87,7 +88,7 @@ const handleSubmit = async () => {
             </h3>
             <input
                 type="text"
-                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input "
+                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input"
                 placeholder="Nome"
                 v-model="form.name"
             />
@@ -131,10 +132,10 @@ const handleSubmit = async () => {
             </div>
             <Button
                 ref="buttonInput"
-                class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2"
+                class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"
                 :disabled="buttonInput?.disabled"
             >
-                Submit
+                Confirmar
             </Button>
             <Transition name="slide-fade">
                 <span
@@ -166,6 +167,7 @@ const handleSubmit = async () => {
     opacity: 0;
 }
 /* remover bordas */
+select:focus,
 input:focus {
     border-color: inherit;
     -webkit-box-shadow: none;

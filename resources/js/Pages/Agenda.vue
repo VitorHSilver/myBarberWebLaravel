@@ -4,46 +4,10 @@ import NavBar from "@/components/NavBar.vue";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Head } from "@inertiajs/vue3";
 import AppointmentForm from "@/components/AppointmentForm.vue";
-import AppLayout from "@/Layouts/AppLayout.vue";
-import { useToast } from "primevue";
+import AppLayout from "@/Layouts/Toast.vue";
 
 
-const { form, timesSlot } = useAppointmentForm();
-const showVideo = ref(true);
-const currentDate = new Date().toLocaleDateString("en-CA");
-const toast = useToast();
-
-onMounted(() => {
-    fetchTimes();
-    setInterval(() => {
-        if (form.date === currentDate) {
-            fetchTimes();
-        }
-    }, 60000);
-    if (window.innerWidth < 768) {
-        showVideo.value = false;
-    }
-});
-
-const fetchTimes = async () => {
-    try {
-        const response = await fetch(
-            `http://localhost:3000/api/consults/free-times?date=${form.date}`
-        );
-        if (!response.ok)
-            throw new Error("Erro ao buscar os horários disponíveis");
-        const data = await response.json();
-        timesSlot.value = data.times;
-        console.log(data);
-        if (form.hour && !timesSlot.value.includes(form.hour)) {
-            form.hour = "";
-        } else if (!form.hour && timesSlot.value.length > 0) {
-            form.hour = timesSlot.value[0];
-        }
-    } catch (erro) {
-        console.error("Erro:", erro);
-    }
-};
+const {  showVideo } = useAppointmentForm();
 
 
 </script>
@@ -55,7 +19,6 @@ const fetchTimes = async () => {
         <div
             class="relative max-2xl:pt-32 px-8 pb-16 overflow-hidden text-white bg-gradient-to-t from-marrom-950/40 max-smallscreen:bg-gradient-to-tr max-smallscreen:from-transparent rounded-lg"
         >
-            
             <video
                 v-if="showVideo"
                 id="video"
