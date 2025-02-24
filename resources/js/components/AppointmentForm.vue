@@ -165,5 +165,10 @@ const handleSubmit = async () => {
     transform: translateX(20px);
     opacity: 0;
 }
-
+/* remover bordas */
+input:focus {
+    border-color: inherit;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
 </style>
