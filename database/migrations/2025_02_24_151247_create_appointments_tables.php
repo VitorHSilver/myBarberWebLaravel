@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->time('time');
-            $table->foreignId('user_id')->null->constrained()->onDelete('cascade');
+            $table->string('email')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appointmensts_tables');
+        Schema::dropIfExists('appointments_tables');
     }
 };

@@ -108,18 +108,18 @@ const handleSubmit = async () => {
             <div class="flex max-md:flex-col max-md:gap-2">
                 <input
                     type="date"
-                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
+                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full "
                     v-model="form.date"
                     @change="checkDate"
                     @focus="checkDate"
                     ref="dateInput"
                 />
-                <div v-show="showTimeSelect" class="block">
+                <div v-show="showTimeSelect" class="block flex-grow ">
                     <select
-                        class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black"
+                        class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
                         v-model="form.hour"
                     >
-                        <option disabled value="">Horarios:</option>
+                        <option disabled value="">Horarios</option>
                         <option
                             v-for="times in timesSlot"
                             :key="times"
