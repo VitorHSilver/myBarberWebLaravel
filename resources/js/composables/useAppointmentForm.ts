@@ -1,6 +1,6 @@
 import { ref, reactive, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
-import { date } from "@primeuix/themes/aura/datepicker";
+import axios from "axios";
 
 export function useAppointmentForm() {
     const currentDate = new Date().toLocaleDateString("en-CA");
@@ -9,84 +9,81 @@ export function useAppointmentForm() {
     const timesSlot = ref<string[]>([]);
     const showVideo = ref(true);
     const toast = useToast();
-
+    const dateInput = ref<HTMLInputElement | null>(null);
     const form = reactive({
         name: "",
         email: "",
         fone: "",
         date: currentDate,
-        hour: "",
+        time: "",
     });
 
     const fetchTimes = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/consults/free-times?date=${form.date}`
+            const response = await axios.get(
+                `http://localhost:8000/api/free-times`,
+                {
+                    params: { date: form.date },
+                }
             );
-            if (!response.ok)
-                throw new Error("Erro ao buscar os horários disponíveis");
-            const data = await response.json();
-            timesSlot.value = data.times;
-            if (form.hour && !timesSlot.value.includes(form.hour)) {
-                form.hour = "";
-            } else if (!form.hour && timesSlot.value.length > 0) {
-                form.hour = timesSlot.value[0];
+            timesSlot.value = response.data.times;
+            if (form.time && !timesSlot.value.includes(form.time)) {
+                form.time = "";
+            } else if (!form.time && timesSlot.value.length > 0) {
+                form.time = timesSlot.value[0];
             }
         } catch (error) {
             console.error("Erro:", error);
         }
     };
 
-    const handleSubmit = async () => {
-        if (!form.name || !form.date || !form.fone || !form.hour) {
-            notificationError.value = true;
-            setTimeout(() => {
-                notificationError.value = false;
-            }, 3000);
-            return;
-        }
+    // const handleSubmit = async () => {
+    //     if (!form.name || !form.date || !form.fone || !form.time) {
+    //         notificationError.value = true;
+    //         setTimeout(() => {
+    //             notificationError.value = false;
+    //         }, 3000);
+    //         return;
+    //     }
+    //     try {
+    //         const response = await axios.post(
+    //             "http://localhost:8000/api/consults",
+    //             form
+    //         );
+    //         const data = response.data;
 
-        try {
-            const response = await fetch("http://localhost:3000/api/consults", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                cleanField();
-                toast.add({
-                    severity: "success",
-                    summary: "Consulta marcada!",
-                    detail: data.message,
-                    life: 3000,
-                });
-            } else {
-                toast.add({
-                    severity: "error",
-                    summary: "Erro",
-                    detail: `${data.erro}`,
-                    life: 3000,
-                });
-            }
-        } catch (error) {
-            toast.add({
-                severity: "error",
-                summary: "Erro",
-                detail: "Erro ao enviar os dados.",
-                life: 3000,
-            });
-            console.error(error);
-        }
-    };
+    //         if (response.status === 201) {
+    //             cleanField();
+    //             toast.add({
+    //                 severity: "success",
+    //                 summary: "Consulta marcada!",
+    //                 detail: data.message,
+    //                 life: 3000,
+    //             });
+    //         } else {
+    //             toast.add({
+    //                 severity: "error",
+    //                 summary: "Erro",
+    //                 detail: `${data.erro}`,
+    //                 life: 3000,
+    //             });
+    //         }
+    //     } catch (error) {
+    //         toast.add({
+    //             severity: "error",
+    //             summary: "Erro",
+    //             detail: "Erro ao enviar os dados.",
+    //             life: 3000,
+    //         });
+    //         console.error(error);
+    //     }
+    // };
 
     const formatPhoneNumber = () => {
         let fone = form.fone.replace(/\D/g, "");
         if (fone.length > 11) {
             fone = fone.slice(0, 11);
+            dateInput.value?.focus();
         }
         if (fone.length === 11) {
             form.fone = `(${fone.slice(0, 2)}) ${fone.slice(2, 7)}-${fone.slice(
@@ -106,7 +103,7 @@ export function useAppointmentForm() {
         form.email = "";
         form.fone = "";
         form.date = currentDate;
-        form.hour = "";
+        form.time = "";
     };
 
     const isBusinessDay = (dateString: string) => {
@@ -158,10 +155,11 @@ export function useAppointmentForm() {
         showTimeSelect,
         notificationError,
         fetchTimes,
-        handleSubmit,
+
         formatPhoneNumber,
         checkDate,
         cleanField,
-        showVideo
+        showVideo,
+        dateInput,
     };
 }

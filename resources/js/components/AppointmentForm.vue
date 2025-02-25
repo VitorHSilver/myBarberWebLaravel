@@ -2,7 +2,8 @@
 import { useToast } from "primevue/usetoast";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
+import axios from "axios";
 
 const {
     form,
@@ -12,12 +13,14 @@ const {
     formatPhoneNumber,
     checkDate,
     cleanField,
+    dateInput,
 } = useAppointmentForm();
 
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
 const handleSubmit = async () => {
+    console.log(form);
     if (buttonInput.value?.disabled) {
         toast.add({
             severity: "error",
@@ -27,7 +30,7 @@ const handleSubmit = async () => {
         });
         return;
     }
-    if (!form.name || !form.email || !form.date || !form.fone || !form.hour) {
+    if (!form.name || !form.email || !form.date || !form.time) {
         notificationError.value = true;
         setTimeout(() => {
             notificationError.value = false;
@@ -35,17 +38,13 @@ const handleSubmit = async () => {
         return;
     } else {
         try {
-            const response = await fetch("http://localhost:3000/api/consults", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            });
-            const data = await response.json();
-            console.log(data);
-
-            if (response.ok) {
+            const response = await axios.post(
+                "http://localhost:8000/api/",
+                form
+            );
+            console.log("Resposta da API:", response);
+            const data = response.data;
+            if (response.status === 201) {
                 cleanField();
                 toast.add({
                     severity: "success",
@@ -57,22 +56,21 @@ const handleSubmit = async () => {
                 toast.add({
                     severity: "error",
                     summary: "Erro",
-                    detail: `${data.erro}`,
+                    detail: "Erro ao criar a consulta",
                     life: 3000,
                 });
             }
-        } catch (erro) {
+        } catch (error) {
             toast.add({
                 severity: "error",
                 summary: "Erro",
-                detail: "Erro ao enviar os dados.",
+                detail: `Erro ao enviar os dados:${error}`,
                 life: 3000,
             });
-            console.log(erro);
+            console.error(error);
         }
     }
-}
-
+};
 </script>
 
 <template>
@@ -92,11 +90,13 @@ const handleSubmit = async () => {
                 placeholder="Nome"
                 v-model="form.name"
             />
+
             <input
                 type="email"
                 class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 invalid:border-pink-500"
                 placeholder="Email"
                 v-model="form.email"
+                re
             />
             <input
                 type="text"
@@ -108,16 +108,16 @@ const handleSubmit = async () => {
             <div class="flex max-md:flex-col max-md:gap-2">
                 <input
                     type="date"
-                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full "
+                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
                     v-model="form.date"
                     @change="checkDate"
                     @focus="checkDate"
                     ref="dateInput"
                 />
-                <div v-show="showTimeSelect" class="block flex-grow ">
+                <div v-show="showTimeSelect" class="block flex-grow">
                     <select
                         class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
-                        v-model="form.hour"
+                        v-model="form.time"
                     >
                         <option disabled value="">Horarios</option>
                         <option
@@ -166,6 +166,7 @@ const handleSubmit = async () => {
     transform: translateX(20px);
     opacity: 0;
 }
+
 /* remover bordas */
 select:focus,
 input:focus {
