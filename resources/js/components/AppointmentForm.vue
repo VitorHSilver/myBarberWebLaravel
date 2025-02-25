@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
-import {
-    useAppointmentForm,
-    ValidationErrors,
-} from "@/composables/useAppointmentForm";
+import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
 import { computed, ref } from "vue";
 import axios, { AxiosError } from "axios";
@@ -18,7 +15,6 @@ const {
     cleanField,
     dateInput,
     isDateValid,
-    errors,
 } = useAppointmentForm();
 const isButtonDisabled = computed(() => {
     return !isDateValid.value;
@@ -26,7 +22,6 @@ const isButtonDisabled = computed(() => {
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
-console.log(errors.value);
 const handleSubmit = async () => {
     // if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
     //     notificationError.value = true;
@@ -57,15 +52,6 @@ const handleSubmit = async () => {
     } catch (error) {
         const axiosError = error as AxiosError;
         if (axiosError.response && axiosError.response.status === 422) {
-            const validationErrors = axiosError.response.data as {
-                errors: ValidationErrors;
-            };
-            console.log(
-                "Erros de validação recebidos:",
-                validationErrors.errors
-            ); // Depuração
-            errors.value = validationErrors.errors; // Armazena os erros
-            console.log("errors.value após atribuição:", errors.value); // Confirmação
             toast.add({
                 severity: "error",
                 summary: "Erro",
@@ -75,7 +61,7 @@ const handleSubmit = async () => {
         } else {
             toast.add({
                 severity: "error",
-                summary: "Erro",
+                summary: "Error",
                 detail: (axiosError.response?.data as { message: string })
                     .message,
                 life: 3000,

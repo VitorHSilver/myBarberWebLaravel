@@ -29,6 +29,7 @@ class AppointmentService
         $lunchStart = Carbon::parse("{$selectedDate} {$config['lunch_start']}");
         $lunchEnd = Carbon::parse("{$selectedDate} {$config['lunch_end']}");
 
+
         while ($currentTime < $endOffice) {
             $timeFormatted = $currentTime->format('H:i');
             if (!($currentTime->between($lunchStart, $lunchEnd))) {
@@ -66,9 +67,16 @@ class AppointmentService
         // Ajuste se fora do expediente (somente para hoje)
         $config = self::getEnvConfig();
         $endOfficeCheck = Carbon::parse("{$selectedDate} {$config['end_exp']}");
+
+        // Se for hoje e o horário atual for após o fim do expediente, não retornar horários
+        if ($isToday && $now->gt($endOfficeCheck)) {
+            return []; // Retorna array vazio, indicando que não há horários disponíveis
+        }
+
         if ($isToday && $now > $endOfficeCheck) {
             $now = Carbon::parse("{$selectedDate} {$config['start_exp']}");
         }
+
 
         $timetables = self::generateHoursList($selectedDate);
         $bookedTimes = self::getBookedTimes($selectedDate);

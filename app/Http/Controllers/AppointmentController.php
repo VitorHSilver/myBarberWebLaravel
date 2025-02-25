@@ -31,15 +31,15 @@ class AppointmentController extends Controller
     {
         try {
             $messages = [
-                'name.required' => 'O nome é obrigatório.',
-                'name.min' => 'O nome deve ter pelo menos 2 caracteres.',
-                'name.max' => 'O nome deve ter no máximo 255 caracteres.',
-                'date.required' => 'A data é obrigatória.',
-                'fone.min' => 'O telefone deve ter pelo menos 13 caracteres.',
-                'fone.max' => 'O telefone deve ter no máximo 15 caracteres.',
-                'date.date' => 'A data deve ser uma data válida.',
-                'time.required' => 'O horário é obrigatório.',
-                'email.required' => 'O email é obrigatório.',
+                'name.required' => ' nome é obrigatório.',
+                'name.min' => ' nome deve ter pelo menos 2 caracteres.',
+                'name.max' => ' nome deve ter no máximo 255 caracteres.',
+                'date.required' => '  data é obrigatória.',
+                'fone.min' => ' telefone deve ter pelo menos 13 caracteres.',
+                'fone.max' => ' telefone deve ter no máximo 15 caracteres.',
+                'date.date' => ' data deve ser uma data válida.',
+                'time.required' => ' horário é obrigatório.',
+                'email.required' => ' email é obrigatório.',
                 'email.email' => 'Insira um email válido.',
             ];
 
@@ -81,7 +81,7 @@ class AppointmentController extends Controller
             return response()->json(['message' => 'Consulta criada!', 'Appointment' => $appointment], 201);
         } catch (\Exception $e) {
             Log::error('Erro ao criar agendamento: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
-            return response()->json(['message' => 'Erro:' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error:' . $e->getMessage()], 500);
         }
     }
 

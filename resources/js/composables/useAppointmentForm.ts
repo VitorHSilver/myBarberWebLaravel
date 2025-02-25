@@ -2,9 +2,7 @@ import { ref, reactive, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 
-export interface ValidationErrors {
-    [key: string]: string[]; // Chaves como "name", "email", etc., com arrays de strings
-}
+
 
 export function useAppointmentForm() {
     const currentDate = new Date().toLocaleDateString("en-CA");
@@ -16,7 +14,7 @@ export function useAppointmentForm() {
     const dateInput = ref<HTMLInputElement | null>(null);
     const isDateValid = ref(true);
 
-    const errors = ref<ValidationErrors>({});
+   
 
     const form = reactive({
         name: "",
@@ -70,7 +68,6 @@ export function useAppointmentForm() {
         form.fone = "";
         form.date = currentDate;
         form.time = "";
-        errors.value = {};
         isDateValid.value = true;
     };
 
@@ -132,6 +129,5 @@ export function useAppointmentForm() {
         showVideo,
         dateInput,
         isDateValid,
-        errors,
     };
 }
