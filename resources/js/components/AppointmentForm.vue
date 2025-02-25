@@ -76,7 +76,7 @@ const handleSubmit = async () => {
 <template>
     <form
         @submit.prevent="handleSubmit"
-        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-4 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:border-n max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
+        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:border-n max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
     >
         <div class="grid gap-4 p-2 max-sm:p-0 max-sm:gap-2 max-md:w-full">
             <h3

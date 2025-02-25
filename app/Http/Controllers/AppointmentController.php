@@ -66,40 +66,44 @@ class AppointmentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $appointment = Appointment::findOrFail($id);
+        try {
+            $appointment = Appointment::findOrFail($id);
+    
+            $messages = [
+                'name.required' => 'O nome é obrigatório.',
+                'name.min' => 'O nome deve ter pelo menos 2 caracteres.',
+                'name.max' => 'O nome deve ter no máximo 255 caracteres.',
+                'date.required' => 'A data é obrigatória.',
+                'fone.min' => 'O telefone deve ter pelo menos 13 caracteres.',
+                'fone.max' => 'O telefone deve ter no máximo 15 caracteres.',
+                'date.date' => 'A data deve ser uma data válida.',
+                'time.required' => 'O horário é obrigatório.',
+                'email.required' => 'O email é obrigatório.',
+                'email.email' => 'Insira um email válido.',
+            ];
 
-        $messages = [
-            'name.required' => 'O nome é obrigatório.',
-            'name.min' => 'O nome deve ter pelo menos 2 caracteres.',
-            'name.max' => 'O nome deve ter no máximo 255 caracteres.',
-            'date.required' => 'A data é obrigatória.',
-            'fone.min' => 'O telefone deve ter pelo menos 9 caracteres.',
-            'fone.max' => 'O telefone deve ter pelo menos 11 caracteres.',
-            'date.date' => 'A data deve ser uma data válida.',
-            'time.required' => 'O horário é obrigatório.',
-            'email.required' => 'O email é obrigatório.',
-            'email.email' => 'Insira um email válido.',
-        ];
 
+            $request->validate([
+                'name' => 'required|string|min:2|max:255',
+                'email' => 'required|email',
+                'fone' => 'string|min:13|max:15',
+                'date' => 'required|date',
+                'time' => 'required',
+            ], $messages);
 
-        $request->validate([
-            'name' => 'required|string|min:2|max:255',
-            'email' => 'required|email',
-            'fone' => 'string|min:9|max:11',
-            'date' => 'required|date',
-            'time' => 'required',
-        ], $messages);
+            $appointment->update([
+                'name' => strtolower($request->name),
+                'email' => strtolower($request->email),
+                'fone' => $request->fone,
+                'date' => $request->date,
+                'time' => $request->time,
+                'user_id' => $appointment->user_id,
+            ]);
 
-        $appointment->update([
-            'name' => strtolower($request->name),
-            'email' => strtolower($request->email),
-            'fone' => $request->fone,
-            'date' => $request->date,
-            'time' => $request->time,
-            'user_id' => $appointment->user_id,
-        ]);
-
-        return response()->json(['message' => 'Consulta atualizada com Sucesso', 'appointment', $appointment], 200);
+            return response()->json(['message' => 'Consulta atualizada com Sucesso', 'appointment', $appointment], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e], 500);
+        }
     }
 
     public function destroy($id)
