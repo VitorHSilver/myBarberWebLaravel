@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { useToast } from "primevue/usetoast";
-import { useAppointmentForm } from "@/composables/useAppointmentForm";
+import {
+    useAppointmentForm,
+    ValidationErrors,
+} from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
-import { reactive, ref } from "vue";
-import axios from "axios";
+import { computed, ref } from "vue";
+import axios, { AxiosError } from "axios";
 
 const {
     form,
@@ -14,60 +17,64 @@ const {
     checkDate,
     cleanField,
     dateInput,
+    isDateValid,
+    errors,
 } = useAppointmentForm();
-
+console.log(errors.value);
+const isButtonDisabled = computed(() => {
+    return !isDateValid.value;
+});
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
 const handleSubmit = async () => {
-    console.log(form);
-    if (buttonInput.value?.disabled) {
-        toast.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Corrija os erros antes de enviar.",
-            life: 3000,
-        });
-        return;
-    }
-    if (!form.name || !form.email || !form.date || !form.time) {
-        notificationError.value = true;
-        setTimeout(() => {
-            notificationError.value = false;
-        }, 3000);
-        return;
-    } else {
-        try {
-            const response = await axios.post(
-                "http://localhost:8000/api/",
-                form
-            );
-            console.log("Resposta da API:", response);
-            const data = response.data;
-            if (response.status === 201) {
-                cleanField();
-                toast.add({
-                    severity: "success",
-                    summary: "Consulta marcada!",
-                    detail: data.message,
-                    life: 3000,
-                });
-            } else {
-                toast.add({
-                    severity: "error",
-                    summary: "Erro",
-                    detail: "Erro ao criar a consulta",
-                    life: 3000,
-                });
-            }
-        } catch (error) {
+    // if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
+    //     notificationError.value = true;
+    //     setTimeout(() => {
+    //         notificationError.value = false;
+    //     }, 3000);
+    //     return;
+    // }
+    try {
+        const response = await axios.post("http://localhost:8000/api/", form);
+        const data = response.data;
+        if (response.status === 201) {
+            cleanField();
+            toast.add({
+                severity: "success",
+                summary: "Consulta marcada!",
+                detail: data.message,
+                life: 3000,
+            });
+        } else {
             toast.add({
                 severity: "error",
                 summary: "Erro",
-                detail: `Erro ao enviar os dados:${error}`,
+                detail: "Erro ao criar a consulta",
                 life: 3000,
             });
-            console.error(error);
+        }
+    } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.status === 422) {
+            const validationErrors = axiosError.response.data as {
+                errors: ValidationErrors;
+            };
+            errors.value = validationErrors.errors; // Armazena os erros para exibição
+            toast.add({
+                severity: "error",
+                summary: "Erro",
+                detail: "Por favor, corrija os campos destacados.",
+                life: 3000,
+            });
+        } else {
+            toast.add({
+                severity: "error",
+                summary: "Erro",
+                detail: (axiosError.response?.data as { message: string })
+                    .message,
+                life: 3000,
+            });
         }
     }
 };
@@ -133,7 +140,7 @@ const handleSubmit = async () => {
             <Button
                 ref="buttonInput"
                 class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"
-                :disabled="buttonInput?.disabled"
+                :disabled="isButtonDisabled"
             >
                 Confirmar
             </Button>

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use App\Services\AppointmentService;
 use Carbon\Carbon;
-use Error;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentController extends Controller
 {
@@ -42,25 +43,44 @@ class AppointmentController extends Controller
                 'email.email' => 'Insira um email válido.',
             ];
 
+            // Vincular todos os agendamentos com o mesmo email ao usuário
+            // Appointment::where('email', strtolower($request->email))
+            // ->whereNull('user_id')
+            // ->update(['user_id' => $user->id]);
+
+
+
+            $fone = str_replace(['(', ')', ' ', '-'], '', $request->input('fone', ''));
+            $time = $request->input('time', '');
+
+            $request->merge([
+                'fone' => $fone,
+                'time' => $time,
+            ]);
+
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => 'string|min:13|max:15',
+                'fone' => ['required', 'regex:/^\d{10,11}$/'], // Aceita 10 ou 11 dígitos (sem formatação)
                 'date' => 'required|date',
-                'time' => 'required',
+                'time' => ['required', 'date_format:H:i'],
             ], $messages);
+
+            // Verificar se o email existe no modelo User
+            $user = User::where('email', strtolower($request->email))->first();
 
             $appointment = Appointment::create([
                 'name' => strtolower($request->name),
                 'email' => strtolower($request->email),
-                'fone' => $request->fone,
+                'fone' => $fone,
                 'date' => $request->date,
-                'time' => $request->time,
-                'user_id' => null,
+                'time' => $time,
+                'user_id' => $user ? $user->id : null,
             ]);
+
             return response()->json(['message' => 'Consulta criada!', 'Appointment' => $appointment], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Erro:' . $e->getMessage()], 500);
         }
     }
 
@@ -68,7 +88,7 @@ class AppointmentController extends Controller
     {
         try {
             $appointment = Appointment::findOrFail($id);
-    
+
             $messages = [
                 'name.required' => 'O nome é obrigatório.',
                 'name.min' => 'O nome deve ter pelo menos 2 caracteres.',

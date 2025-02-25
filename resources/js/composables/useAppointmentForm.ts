@@ -2,6 +2,10 @@ import { ref, reactive, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 
+export interface ValidationErrors {
+    [key: string]: string[]; // Chaves como "name", "email", etc., com arrays de strings
+}
+
 export function useAppointmentForm() {
     const currentDate = new Date().toLocaleDateString("en-CA");
     const showTimeSelect = ref(false);
@@ -10,6 +14,10 @@ export function useAppointmentForm() {
     const showVideo = ref(true);
     const toast = useToast();
     const dateInput = ref<HTMLInputElement | null>(null);
+    const isDateValid = ref(true);
+
+    const errors = ref<ValidationErrors>({});
+
     const form = reactive({
         name: "",
         email: "",
@@ -62,6 +70,8 @@ export function useAppointmentForm() {
         form.fone = "";
         form.date = currentDate;
         form.time = "";
+        errors.value = {};
+        isDateValid.value = true;
     };
 
     const isBusinessDay = (dateString: string) => {
@@ -81,6 +91,7 @@ export function useAppointmentForm() {
                 life: 3000,
             });
             showTimeSelect.value = false;
+            isDateValid.value = false;
         } else if (!isBusinessDay(target.value)) {
             toast.add({
                 severity: "error",
@@ -89,8 +100,10 @@ export function useAppointmentForm() {
                 life: 3000,
             });
             showTimeSelect.value = false;
+            isDateValid.value = false;
         } else {
             showTimeSelect.value = true;
+            isDateValid.value = true;
             fetchTimes();
         }
     };
@@ -118,5 +131,7 @@ export function useAppointmentForm() {
         cleanField,
         showVideo,
         dateInput,
+        isDateValid,
+        errors,
     };
 }
