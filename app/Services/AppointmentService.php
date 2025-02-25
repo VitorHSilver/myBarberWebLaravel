@@ -15,7 +15,7 @@ class AppointmentService
             'end_exp' => env('FIM_EXP', '17:00'),
             'lunch_start' => env('INTERVALO_ALMOCO_INICIO', '12:00'),
             'lunch_end' => env('INTERVALO_ALMOCO_FIM', '14:00'),
-            'duration_cut' => (int) env('DURACAO_CORTE', 60), 
+            'duration_cut' => (int) env('DURACAO_CORTE', 60),
         ];
     }
 
@@ -43,7 +43,12 @@ class AppointmentService
     // Função para buscar horários agendados no banco
     private static function getBookedTimes(string $selectedDate): array
     {
-        return Appointment::whereDate('date', $selectedDate)->pluck('time')->toArray();
+        return Appointment::whereDate('date', $selectedDate)
+            ->pluck('time')
+            ->map(function ($time) {
+                return Carbon::parse($time)->format('H:i'); // Normaliza para "H:i"
+            })
+            ->toArray();
     }
 
     // Função principal para gerar horários disponíveis
@@ -73,12 +78,13 @@ class AppointmentService
 
     private static function filterAvailableTimes(array $timetables, string $selectedDate, bool $isToday, Carbon $now, array $bookedTimes): array
     {
-        return array_filter($timetables, function ($timeFormatted) use ($selectedDate, $isToday, $now, $bookedTimes) {
+        $filtered = array_filter($timetables, function ($timeFormatted) use ($selectedDate, $isToday, $now, $bookedTimes) {
             $currentTime = Carbon::parse("{$selectedDate} {$timeFormatted}");
             $isBooked = in_array($timeFormatted, $bookedTimes);
             $isPast = $isToday && $currentTime < $now;
             return !$isBooked && !$isPast;
         });
+        return array_values($filtered); // Reindexa o array
     }
 
     // Função para listar reservas do dia
