@@ -20,13 +20,13 @@ const {
     isDateValid,
     errors,
 } = useAppointmentForm();
-console.log(errors.value);
 const isButtonDisabled = computed(() => {
     return !isDateValid.value;
 });
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
+console.log(errors.value);
 const handleSubmit = async () => {
     // if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
     //     notificationError.value = true;
@@ -60,7 +60,12 @@ const handleSubmit = async () => {
             const validationErrors = axiosError.response.data as {
                 errors: ValidationErrors;
             };
-            errors.value = validationErrors.errors; // Armazena os erros para exibição
+            console.log(
+                "Erros de validação recebidos:",
+                validationErrors.errors
+            ); // Depuração
+            errors.value = validationErrors.errors; // Armazena os erros
+            console.log("errors.value após atribuição:", errors.value); // Confirmação
             toast.add({
                 severity: "error",
                 summary: "Erro",

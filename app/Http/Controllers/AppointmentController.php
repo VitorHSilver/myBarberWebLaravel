@@ -80,6 +80,7 @@ class AppointmentController extends Controller
 
             return response()->json(['message' => 'Consulta criada!', 'Appointment' => $appointment], 201);
         } catch (\Exception $e) {
+            Log::error('Erro ao criar agendamento: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             return response()->json(['message' => 'Erro:' . $e->getMessage()], 500);
         }
     }
