@@ -37,48 +37,6 @@ export function useAppointmentForm() {
         }
     };
 
-    // const handleSubmit = async () => {
-    //     if (!form.name || !form.date || !form.fone || !form.time) {
-    //         notificationError.value = true;
-    //         setTimeout(() => {
-    //             notificationError.value = false;
-    //         }, 3000);
-    //         return;
-    //     }
-    //     try {
-    //         const response = await axios.post(
-    //             "http://localhost:8000/api/consults",
-    //             form
-    //         );
-    //         const data = response.data;
-
-    //         if (response.status === 201) {
-    //             cleanField();
-    //             toast.add({
-    //                 severity: "success",
-    //                 summary: "Consulta marcada!",
-    //                 detail: data.message,
-    //                 life: 3000,
-    //             });
-    //         } else {
-    //             toast.add({
-    //                 severity: "error",
-    //                 summary: "Erro",
-    //                 detail: `${data.erro}`,
-    //                 life: 3000,
-    //             });
-    //         }
-    //     } catch (error) {
-    //         toast.add({
-    //             severity: "error",
-    //             summary: "Erro",
-    //             detail: "Erro ao enviar os dados.",
-    //             life: 3000,
-    //         });
-    //         console.error(error);
-    //     }
-    // };
-
     const formatPhoneNumber = () => {
         let fone = form.fone.replace(/\D/g, "");
         if (fone.length > 11) {
@@ -155,7 +113,6 @@ export function useAppointmentForm() {
         showTimeSelect,
         notificationError,
         fetchTimes,
-
         formatPhoneNumber,
         checkDate,
         cleanField,

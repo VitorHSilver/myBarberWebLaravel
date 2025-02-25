@@ -7,6 +7,7 @@ import AppointmentForm from "@/components/AppointmentForm.vue";
 import AppLayout from "@/Layouts/Toast.vue";
 
 const { showVideo } = useAppointmentForm();
+
 </script>
 <template>
     <Head title="Home" />

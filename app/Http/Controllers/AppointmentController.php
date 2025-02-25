@@ -108,6 +108,7 @@ class AppointmentController extends Controller
 
         return response()->json(['message' => 'Consulta excluída!'], 200);
     }
+
     public function getAvailableTimes(Request $request)
     {
         try {
@@ -119,8 +120,24 @@ class AppointmentController extends Controller
         }
     }
 
+    public function getReservationsOfDay(Request $request)
+    {
+        try {
+            $date = $request->query('date');
 
+            $reserves = Appointment::where('date', $date)->get();
+            $countReserves = count($reserves);
+            $reservations = $reserves->map(function ($reserved) {
+                return [
+                    'id' => $reserved->id,
+                    'name' => $reserved->name,
+                    'time' => $reserved->time,
 
-
-    public function getReservationsOfDay() {}
+                ];
+            });
+            return response()->json(['reserved' => $reservations, 'quantity' => $countReserves], 200);
+        } catch (\Exception $e) {
+            return response()->json(["message"  => $e]);
+        }
+    }
 }
