@@ -8,6 +8,7 @@ use App\Services\AppointmentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class AppointmentController extends Controller
 {
@@ -15,15 +16,22 @@ class AppointmentController extends Controller
 
     public function index()
     {
-        $appointments = Appointment::all();
-        return response()->json($appointments, 200);
+        $timeSlot = $this->getAvailableTimesForToday();
+
+        return Inertia::render('Agenda', [
+            'timeSlot' => $timeSlot
+        ]);
     }
 
-
+    // Criar depois
     public function show($id)
     {
         $appointment = Appointment::findOrFail($id);
         return response()->json($appointment, 200);
+
+        // return Inertia::render('AppointmentShow', [
+        //     'appointment' => $appointment,
+        // ]);
     }
 
 
@@ -35,6 +43,7 @@ class AppointmentController extends Controller
                 'name.min' => ' nome deve ter pelo menos 2 caracteres.',
                 'name.max' => ' nome deve ter no máximo 255 caracteres.',
                 'date.required' => '  data é obrigatória.',
+                'fone.required' => ' telefone é obrigatório',
                 'fone.min' => ' telefone deve ter pelo menos 13 caracteres.',
                 'fone.max' => ' telefone deve ter no máximo 15 caracteres.',
                 'date.date' => ' data deve ser uma data válida.',
@@ -61,9 +70,9 @@ class AppointmentController extends Controller
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{10,11}$/'], // Aceita 10 ou 11 dígitos (sem formatação)
-                'date' => 'required|date',
-                'time' => ['required', 'date_format:H:i'],
+                'fone' => ['required', 'regex:/^\d{10,11}$/'],
+                'date' => 'required|date|after_or_equal:today',
+                'time' => 'required|date_format:H:i',
             ], $messages);
 
             // Verificar se o email existe no modelo User
@@ -78,10 +87,15 @@ class AppointmentController extends Controller
                 'user_id' => $user ? $user->id : null,
             ]);
 
-            return response()->json(['message' => 'Consulta criada!', 'Appointment' => $appointment], 201);
+            return redirect()->route('home')->with('success', 'Consulta marcada!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Captura erros de validação e retorna para o frontend via Inertia
+            return redirect()->back()
+                ->withErrors($e->validator->errors())
+                ->withInput();
         } catch (\Exception $e) {
             Log::error('Erro ao criar agendamento: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
-            return response()->json(['message' => 'Error:' . $e->getMessage()], 500);
+            return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
         }
     }
 
@@ -132,9 +146,14 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
         $appointment->delete();
 
-        return response()->json(['message' => 'Consulta excluída!'], 200);
+        return redirect()->route('home')->with('success', 'Consulta excluída com sucesso!');
     }
 
+    private function getAvailableTimesForToday()
+    {
+        $date = now()->toDateString();
+        return AppointmentService::generateAvailableTimes($date);
+    }
     public function getAvailableTimes(Request $request)
     {
         try {
@@ -146,6 +165,7 @@ class AppointmentController extends Controller
         }
     }
 
+    //api
     public function getReservationsOfDay(Request $request)
     {
         try {
@@ -164,5 +184,11 @@ class AppointmentController extends Controller
         } catch (\Exception $e) {
             return response()->json(["message"  => $e]);
         }
+    }
+
+    public function getAllAppointment()
+    {
+        $appointments = Appointment::all();
+        return response()->json($appointments, 200);
     }
 }

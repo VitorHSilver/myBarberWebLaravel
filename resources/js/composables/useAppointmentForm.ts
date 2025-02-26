@@ -1,8 +1,9 @@
 import { ref, reactive, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
+import { useForm } from "@inertiajs/vue3";
 
-export function useAppointmentForm() {
+export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
     const currentDate = new Date().toLocaleDateString("en-CA");
     const showTimeSelect = ref(false);
     const notificationError = ref(false);
@@ -12,7 +13,7 @@ export function useAppointmentForm() {
     const dateInput = ref<HTMLInputElement | null>(null);
     const isDateValid = ref(true);
 
-    const form = reactive({
+    const form = useForm({
         name: "",
         email: "",
         fone: "",
@@ -20,24 +21,24 @@ export function useAppointmentForm() {
         time: "",
     });
 
-    const fetchTimes = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8000/api/free-times`,
-                {
-                    params: { date: form.date },
-                }
-            );
-            timesSlot.value = response.data.times;
-            if (form.time && !timesSlot.value.includes(form.time)) {
-                form.time = "";
-            } else if (!form.time && timesSlot.value.length > 0) {
-                form.time = timesSlot.value[0];
-            }
-        } catch (error) {
-            console.error("Erro:", error);
-        }
-    };
+    // const fetchTimes = async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             `http://localhost:8000/api/free-times`,
+    //             {
+    //                 params: { date: formInertia.date },
+    //             }
+    //         );
+    //         timesSlot.value = response.data.times;
+    //         if (form.time && !timesSlot.value.includes(form.time)) {
+    //             form.time = "";
+    //         } else if (!form.time && timesSlot.value.length > 0) {
+    //             form.time = timesSlot.value[0];
+    //         }
+    //     } catch (error) {
+    //         console.error("Erro:", error);
+    //     }
+    // };
 
     const formatPhoneNumber = () => {
         let fone = form.fone.replace(/\D/g, "");
@@ -59,11 +60,8 @@ export function useAppointmentForm() {
     };
 
     const cleanField = () => {
-        form.name = "";
-        form.email = "";
-        form.fone = "";
+        form.reset();
         form.date = currentDate;
-        form.time = "";
         isDateValid.value = true;
     };
 
@@ -97,17 +95,10 @@ export function useAppointmentForm() {
         } else {
             showTimeSelect.value = true;
             isDateValid.value = true;
-            fetchTimes();
         }
     };
 
     onMounted(() => {
-        fetchTimes();
-        setInterval(() => {
-            if (form.date === currentDate) {
-                fetchTimes();
-            }
-        }, 60000);
         if (window.innerWidth < 768) {
             showVideo.value = false;
         }
@@ -118,7 +109,6 @@ export function useAppointmentForm() {
         timesSlot,
         showTimeSelect,
         notificationError,
-        fetchTimes,
         formatPhoneNumber,
         checkDate,
         cleanField,

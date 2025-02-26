@@ -3,11 +3,15 @@ import { useToast } from "primevue/usetoast";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
 import { computed, ref } from "vue";
-import axios, { AxiosError } from "axios";
+import InputError from "@/Components/InputError.vue";
+import { usePage } from "@inertiajs/vue3";
+
+const page = usePage();
+const timesSlot = page.props.timeSlot as string[];
+const errors = page.props.errors;
 
 const {
     form,
-    timesSlot,
     showTimeSelect,
     notificationError,
     formatPhoneNumber,
@@ -15,59 +19,49 @@ const {
     cleanField,
     dateInput,
     isDateValid,
-} = useAppointmentForm();
+} = useAppointmentForm({ timesSlot });
 
 const isButtonDisabled = computed(() => {
     return !isDateValid.value;
 });
+
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
 const handleSubmit = async () => {
-    if (!form.name.trim() && !form.email.trim()  && !form.fone) {
+    if (!form.name.trim() && !form.email.trim() && !form.fone) {
         notificationError.value = true;
         setTimeout(() => (notificationError.value = false), 3000);
         return;
     }
-    try {
-        const response = await axios.post("http://localhost:8000/api/", form);
-        const data = response.data;
-
-        if (response.status === 201) {
+    form.post("/appointments", {
+        onSuccess: () => {
             cleanField();
             toast.add({
                 severity: "success",
                 summary: "Consulta marcada!",
-                detail: data.message,
+                detail: "Consulta agendada com sucesso",
                 life: 3000,
             });
-        } else {
-            toast.add({
-                severity: "error",
-                summary: "Erro",
-                detail: "Erro ao criar a consulta",
-                life: 3000,
-            });
-        }
-    } catch (error) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response && axiosError.response.status === 422) {
+        },
+        onError: (
+            errors: Partial<
+                Record<"name" | "email" | "fone" | "date" | "time", string>
+            >
+        ) => {
             toast.add({
                 severity: "error",
                 summary: "Erro",
                 detail: "Por favor, corrija os campos destacados.",
                 life: 3000,
             });
-        } else {
-            toast.add({
-                severity: "error",
-                summary: "Error",
-                detail: (axiosError.response?.data as { message: string })
-                    .message,
-                life: 3000,
+            // Atualiza os erros no formulário para exibição com InputError
+            Object.keys(errors).forEach((key) => {
+                form.errors[key as keyof typeof errors] =
+                    errors[key as keyof typeof errors];
             });
-        }
-    }
+        },
+    });
 };
 </script>
 
@@ -82,20 +76,28 @@ const handleSubmit = async () => {
             >
                 Agende seu Corte
             </h3>
-            <input
-                type="text"
-                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input"
-                placeholder="Nome"
-                v-model="form.name"
-            />
-
-            <input
-                type="email"
-                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
-                placeholder="Email"
-                v-model="form.email"
-                re
-            />
+            <div>
+                <input
+                    type="text"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input relative"
+                    placeholder="Nome"
+                    v-model="form.name"
+                />
+                <InputError :message="form.errors.name" />
+            </div>
+            <div>
+           
+                <input
+                    type="email"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 peer"
+                    placeholder="Email"
+                    v-model="form.email"
+                />
+                <InputError
+                    class="visible peer-invalid:hidden"
+                    :message="form.errors.email"
+                />
+            </div>
             <input
                 type="text"
                 class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
@@ -103,6 +105,7 @@ const handleSubmit = async () => {
                 v-model="form.fone"
                 @input="formatPhoneNumber"
             />
+            <InputError :message="form.errors.fone" />
             <div class="flex max-md:flex-col max-md:gap-2">
                 <input
                     type="date"
