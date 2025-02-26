@@ -24,7 +24,7 @@ const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
 const handleSubmit = async () => {
-    if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
+    if (!form.name.trim() && !form.email.trim()  && !form.fone) {
         notificationError.value = true;
         setTimeout(() => (notificationError.value = false), 3000);
         return;
@@ -91,7 +91,7 @@ const handleSubmit = async () => {
 
             <input
                 type="email"
-                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 invalid:border-pink-500"
+                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
                 placeholder="Email"
                 v-model="form.email"
                 re
