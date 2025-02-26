@@ -82,31 +82,33 @@ const handleSubmit = async () => {
                     class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input relative"
                     placeholder="Nome"
                     v-model="form.name"
+                    @input="form.errors.name = undefined"
                 />
                 <InputError :message="form.errors.name" />
             </div>
             <div>
-           
                 <input
                     type="email"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 peer"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
                     placeholder="Email"
                     v-model="form.email"
+                    @input="form.errors.email = undefined"
                 />
-                <InputError
-                    class="visible peer-invalid:hidden"
-                    :message="form.errors.email"
-                />
+                <InputError :message="form.errors.email" />
             </div>
-            <input
-                type="text"
-                class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
-                placeholder="Fone"
-                v-model="form.fone"
-                @input="formatPhoneNumber"
-            />
-            <InputError :message="form.errors.fone" />
-            <div class="flex max-md:flex-col max-md:gap-2">
+            <div>
+                <input
+                    type="text"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
+                    placeholder="Fone"
+                    v-model="form.fone"
+                    @input="form.errors.fone = undefined; formatPhoneNumber()"
+               
+                />
+                <InputError :message="form.errors.fone" />
+            </div>
+
+            <div class="flex max-md:flex-col max-md:gap-4">
                 <input
                     type="date"
                     class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
