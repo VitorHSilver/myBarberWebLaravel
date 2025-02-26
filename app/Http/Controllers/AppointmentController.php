@@ -70,7 +70,7 @@ class AppointmentController extends Controller
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{10,11}$/'],
+                'fone' => ['required', 'regex:/^\d{8,11}$/'],
                 'date' => 'required|date|after_or_equal:today',
                 'time' => 'required|date_format:H:i',
             ], $messages);
@@ -118,12 +118,21 @@ class AppointmentController extends Controller
             ];
 
 
+
+            $fone = str_replace(['(', ')', ' ', '-'], '', $request->input('fone', ''));
+            $time = $request->input('time', '');
+
+            $request->merge([
+                'fone' => $fone,
+                'time' => $time,
+            ]);
+
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => 'string|min:13|max:15',
-                'date' => 'required|date',
-                'time' => 'required',
+                'fone' => ['required', 'regex:/^\d{8,11}$/'],
+                'date' => 'required|date|after_or_equal:today',
+                'time' => 'required|date_format:H:i',
             ], $messages);
 
             $appointment->update([
