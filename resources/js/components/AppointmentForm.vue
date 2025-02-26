@@ -44,21 +44,12 @@ const handleSubmit = async () => {
                 life: 3000,
             });
         },
-        onError: (
-            errors: Partial<
-                Record<"name" | "email" | "fone" | "date" | "time", string>
-            >
-        ) => {
+        onError: () => {
             toast.add({
                 severity: "error",
                 summary: "Erro",
                 detail: "Por favor, corrija os campos destacados.",
                 life: 3000,
-            });
-            // Atualiza os erros no formulário para exibição com InputError
-            Object.keys(errors).forEach((key) => {
-                form.errors[key as keyof typeof errors] =
-                    errors[key as keyof typeof errors];
             });
         },
     });
@@ -102,8 +93,10 @@ const handleSubmit = async () => {
                     class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
                     placeholder="Fone"
                     v-model="form.fone"
-                    @input="form.errors.fone = undefined; formatPhoneNumber()"
-               
+                    @input="
+                        form.errors.fone = undefined;
+                        formatPhoneNumber();
+                    "
                 />
                 <InputError :message="form.errors.fone" />
             </div>

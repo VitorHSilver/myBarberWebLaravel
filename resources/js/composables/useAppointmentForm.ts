@@ -21,25 +21,6 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
         time: "",
     });
 
-    // const fetchTimes = async () => {
-    //     try {
-    //         const response = await axios.get(
-    //             `http://localhost:8000/api/free-times`,
-    //             {
-    //                 params: { date: formInertia.date },
-    //             }
-    //         );
-    //         timesSlot.value = response.data.times;
-    //         if (form.time && !timesSlot.value.includes(form.time)) {
-    //             form.time = "";
-    //         } else if (!form.time && timesSlot.value.length > 0) {
-    //             form.time = timesSlot.value[0];
-    //         }
-    //     } catch (error) {
-    //         console.error("Erro:", error);
-    //     }
-    // };
-
     const formatPhoneNumber = () => {
         let fone = form.fone.replace(/\D/g, "");
         if (fone.length > 11) {

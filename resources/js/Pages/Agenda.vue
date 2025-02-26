@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
 import NavBar from "@/components/NavBar.vue";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Head } from "@inertiajs/vue3";
 import AppointmentForm from "@/components/AppointmentForm.vue";
 import AppLayout from "@/Layouts/Toast.vue";
 
-const { showVideo } = useAppointmentForm();
 
+const { showVideo } = useAppointmentForm();
 </script>
 <template>
     <Head title="Home" />
@@ -27,7 +26,7 @@ const { showVideo } = useAppointmentForm();
                 class="absolute inset-0 object-cover -z-10 size-full shadow-sm shadow-slate-700 m-auto mt-6 rounded-lg max-smallscreen:w-full max-smallscreen:h-44"
                 width="1280"
                 height="720"
-                src="/6113143-hd_1280_720_60fps.mp4"
+                src="output.webm"
             ></video>
             <img
                 v-else
