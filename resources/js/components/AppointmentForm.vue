@@ -16,6 +16,7 @@ const {
     dateInput,
     isDateValid,
 } = useAppointmentForm();
+
 const isButtonDisabled = computed(() => {
     return !isDateValid.value;
 });
@@ -23,16 +24,15 @@ const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 
 const handleSubmit = async () => {
-    // if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
-    //     notificationError.value = true;
-    //     setTimeout(() => {
-    //         notificationError.value = false;
-    //     }, 3000);
-    //     return;
-    // }
+    if (!form.name.trim() || !form.email.trim() || !form.date || !form.time) {
+        notificationError.value = true;
+        setTimeout(() => (notificationError.value = false), 3000);
+        return;
+    }
     try {
         const response = await axios.post("http://localhost:8000/api/", form);
         const data = response.data;
+
         if (response.status === 201) {
             cleanField();
             toast.add({

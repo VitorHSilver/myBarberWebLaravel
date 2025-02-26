@@ -2,8 +2,6 @@ import { ref, reactive, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 
-
-
 export function useAppointmentForm() {
     const currentDate = new Date().toLocaleDateString("en-CA");
     const showTimeSelect = ref(false);
@@ -13,8 +11,6 @@ export function useAppointmentForm() {
     const toast = useToast();
     const dateInput = ref<HTMLInputElement | null>(null);
     const isDateValid = ref(true);
-
-   
 
     const form = reactive({
         name: "",
