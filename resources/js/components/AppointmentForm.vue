@@ -2,10 +2,8 @@
 import { useToast } from "primevue/usetoast";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import InputError from "@/Components/InputError.vue";
-
-const isSubmitting = ref(false);
 
 const {
     form,
@@ -15,13 +13,8 @@ const {
     checkDate,
     cleanField,
     dateInput,
-    isDateValid,
     timesSlot,
 } = useAppointmentForm();
-
-const isButtonDisabled = computed(() => {
-    return !isDateValid.value;
-});
 
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
@@ -32,7 +25,7 @@ const handleSubmit = async () => {
         setTimeout(() => (notificationError.value = false), 3000);
         return;
     }
-    isSubmitting.value = true;
+
     form.post("/appointments", {
         onSuccess: () => {
             cleanField();
@@ -51,7 +44,6 @@ const handleSubmit = async () => {
                 life: 3000,
             });
         },
-        onFinish: () => (isSubmitting.value = false),
     });
 };
 </script>
@@ -121,10 +113,10 @@ const handleSubmit = async () => {
                         v-model="form.time"
                         aria-label="Horario"
                     >
+                        <option disabled value="">Horarios</option>
                         <option v-if="timesSlot.length === 0" disabled>
                             Nenhum horário disponível
                         </option>
-                        <option disabled value="">Horarios</option>
                         <option
                             v-for="times in timesSlot"
                             :key="times"
@@ -138,10 +130,10 @@ const handleSubmit = async () => {
             <Button
                 ref="buttonInput"
                 class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"
-                :disabled="isButtonDisabled || isSubmitting"
                 aria-label="Confirmar agendamento"
+                :disabled="form.processing"
             >
-                {{ isSubmitting ? "Enviando..." : "Confirmar" }}
+                {{ form.processing ? "Enviando..." : "Confirmar" }}
             </Button>
             <Transition name="slide-fade">
                 <span

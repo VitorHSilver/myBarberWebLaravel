@@ -28,13 +28,17 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Barber | Login" />
+    <Head title="Barber | Login" />
 
+    <GuestLayout>
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
-
+        <div class="flex items-center gap-2 my-4">
+            <span class="flex-1 h-px bg-gray-300"></span>
+            <p class="text-gray-500 text-sm">Ou faça login com o seu e-mail</p>
+            <span class="flex-1 h-px bg-gray-300"></span>
+        </div>
         <form @submit.prevent="submit" class="">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -66,21 +70,11 @@ const submit = () => {
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
-            <div class="mt-4 block">
-                <label class="flex items-center">
+            <div class="mt-4 flex justify-between">
+                <label>
                     <Checkbox name="remember" v-model:checked="form.remember" />
                     <span class="ms-2 text-sm text-gray-600">Me lembrar</span>
                 </label>
-            </div>
-
-            <div class="mt-4 flex items-center justify-between">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('register')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Criar Conta
-                </Link>
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
@@ -88,10 +82,23 @@ const submit = () => {
                 >
                     Esqueceu sua senha?
                 </Link>
+            </div>
+
+            <div class="mt-4 grid items-center text-center">
+                <div class="w-full mt-2">
+                    <Link
+                        v-if="canResetPassword"
+                        :href="route('register')"
+                        class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        Criar Conta
+                    </Link>
+                </div>
 
                 <PrimaryButton
-                    class="ms-4"
+                    class="text-center text-lg uppercase bg-black text-white mt-4"
                     :class="{ 'opacity-25': form.processing }"
+                    severity="ghost"
                     :disabled="form.processing"
                 >
                     Logar

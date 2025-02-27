@@ -9,16 +9,21 @@ function updateScreenSize() {
     isSmallScreen.value = window.innerWidth < 768;
 }
 onMounted(() => {
-    updateScreenSize(); 
-    window.addEventListener("resize", updateScreenSize); 
+    updateScreenSize();
+    window.addEventListener("resize", updateScreenSize);
 });
 onUnmounted(() => {
-    window.removeEventListener("resize", updateScreenSize); 
+    window.removeEventListener("resize", updateScreenSize);
 });
 </script>
 
 <template>
     <div class="md:grid grid-cols-2">
+        <div v-if="!isSmallScreen" class=" flex items-center">
+            <img src="/barber-high-resolution-logo-transparent.svg" alt="" />
+        </div>
+        
+        
         <div
             class="flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0 bg-white"
         >
@@ -31,13 +36,10 @@ onUnmounted(() => {
             </div>
 
             <div
-                class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg"
+                class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-lg sm:max-w-md sm:rounded-lg"
             >
                 <slot />
             </div>
-        </div>
-        <div v-if="!isSmallScreen" class="bg-black flex items-center">
-            <img src="/barber-high-resolution-logo-transparent.svg" alt="" />
         </div>
     </div>
 </template>
