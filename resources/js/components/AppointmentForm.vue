@@ -39,8 +39,8 @@ const handleSubmit = async () => {
             toast.add({
                 severity: "success",
                 summary: "Consulta marcada!",
-                detail: "Consulta agendada com sucesso",
-                life: 3000,
+                detail: "Para alterar a data do agendamento, por favor, crie uma conta.",
+                life: 5000,
             });
         },
         onError: () => {
@@ -75,6 +75,7 @@ const handleSubmit = async () => {
                     v-model="form.name"
                     @input="form.errors.name = undefined"
                     aria-label="Nome"
+                    autocomplete="given-name"
                 />
                 <InputError :message="form.errors.name" />
             </div>
@@ -86,6 +87,7 @@ const handleSubmit = async () => {
                     v-model="form.email"
                     @input="form.errors.email = undefined"
                     aria-label="Email"
+                    autocomplete="email"
                 />
                 <InputError :message="form.errors.email" />
             </div>
