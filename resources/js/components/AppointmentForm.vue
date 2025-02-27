@@ -135,7 +135,6 @@ const handleSubmit = async () => {
                     </select>
                 </div>
             </div>
-            <!-- :disabled="isButtonDisabled" -->
             <Button
                 ref="buttonInput"
                 class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"

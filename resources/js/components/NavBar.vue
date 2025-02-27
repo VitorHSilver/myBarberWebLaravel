@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
-// import Button from "primevue/button";
+import { router, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const isMenuVisible = ref(false);
 
 function toggleMenu() {
     isMenuVisible.value = !isMenuVisible.value;
 }
+const page = usePage();
+const user =  true //computed(() => page.props.auth.user);
+const isHomePage = computed(() => page.component === "Agenda");
+const logout = () => {
+    router.post(
+        route("logout"),
+        {},
+        {
+            onSuccess: () => {
+                toggleMenu();
+            },
+        }
+    );
+};
+
+// const isNotLogged = !user && 
 </script>
 
 <template>
@@ -31,41 +46,78 @@ function toggleMenu() {
             >
                 <div
                     class="fixed md:hidden inset-0 bg-marrom-200/2 backdrop-blur-md"
+                    @click="isMenuVisible = false"
                 ></div>
                 <ul
                     class="md:flex gap-x-4 font-roboto max-md:text-3xl text-xl max-md:z-50 max-md:absolute max-md:divide-y-2 max-md:divide-white/10 max-md:p-8 lg:gap-8 max-md:w-full"
                 >
-                    <li class="animate-slide-in opacity-0 animate-1">
+                    <li
+                        v-if="!isHomePage"
+                        class="animate-slide-in opacity-0 animate-1"
+                    >
                         <a
-                            @click="toggleMenu"
+                            @click.stop="toggleMenu"
                             class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            href="#home"
+                            href="/"
                             >Home</a
                         >
                     </li>
-                    <li class="animate-slide-in opacity-0 animate-2">
+                    <li class="animate-slide-in opacity-0 animate-1">
                         <a
-                            @click="toggleMenu"
+                            @click.stop="toggleMenu"
                             class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
                             href="/"
                             >Serviços</a
                         >
                     </li>
-                    <li class="animate-slide-in opacity-0 animate-3">
+                    <li class="animate-slide-in opacity-0 animate-2">
                         <a
-                            @click="toggleMenu"
+                            @click.stop="toggleMenu"
                             class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
                             href="/"
                             >Sobre</a
                         >
                     </li>
-                    <li class="animate-slide-in opacity-0 animate-4">
+                    <li class="animate-slide-in opacity-0 animate-3">
                         <a
-                            @click="toggleMenu"
+                            @click.stop="toggleMenu"
                             class="btn text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
                             href="/"
                             >Contatar</a
                         >
+                    </li>
+                    <li
+                        v-if="user === null"
+                        class="animate-slide-in opacity-0 animate-4 max-md:order-[-1]"
+                    >
+                        <a
+                            @click.stop="toggleMenu"
+                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
+                            :href="
+                                user !== null ? route('home') : route('login')
+                            "
+                            :aria-label="
+                                user !== null
+                                    ? 'Ir para a página inicial'
+                                    : 'Criar uma nova conta'
+                            "
+                            >{{ user !== null ? "Home" : "Login" }}</a
+                        >
+                    </li>
+                    <li
+                        v-if="user !== null"
+                        class="animate-slide-in opacity-0 animate-4"
+                    >
+                        <a
+                            @click.prevent="logout"
+                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
+                            :href="
+                                user !== null ? route('home') : route('login')
+                            "
+                            aria-label="Sair da conta"
+                        >
+                            {{ user !== null ? "Conta" : "Criar" }}
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -83,7 +135,6 @@ function toggleMenu() {
                 </span>
             </button>
         </header>
-        <!-- <img src="./../assets/menu.svg" class="block p-2"></img> -->
     </div>
 </template>
 

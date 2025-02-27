@@ -37,7 +37,7 @@ const { showVideo } = useAppointmentForm();
 
             <AppointmentForm />
 
-            <div class="flex justify-end max-smallscreen:mt-8">
+            <div class="flex max-md:justify-start justify-end max-smallscreen:mt-8">
                 <h1
                     class="font-neuton text-6xl max-sm:text-4xl max-w-sm text-balance max-smallscreen:text-center max-smallscreen:m-auto"
                     aria-label="Subtitulo:Onde a Tradição Encontrará o Estilo Moderno"
