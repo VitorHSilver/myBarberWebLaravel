@@ -8,21 +8,69 @@ function toggleMenu() {
     isMenuVisible.value = !isMenuVisible.value;
 }
 const page = usePage();
-const user =  true //computed(() => page.props.auth.user);
+const user = computed(() => page.props.auth.user);
 const isHomePage = computed(() => page.component === "Agenda");
-const logout = () => {
-    router.post(
-        route("logout"),
-        {},
-        {
-            onSuccess: () => {
-                toggleMenu();
-            },
-        }
-    );
-};
 
-// const isNotLogged = !user && 
+const navLinks = [
+    {
+        label: "Home",
+        href: route("home"),
+        condition: () => !isHomePage.value,
+        ariaLabel: "Ir para a página inicial",
+        animation: "animate-1",
+        order: "",
+        onClick: toggleMenu,
+        fav: "",
+    },
+    {
+        label: "Serviços",
+        href: "",
+        condition: () => true,
+        ariaLabel: "Ir para serviços",
+        animation: "animate-1",
+        order: "",
+        onClick: toggleMenu,
+        fav: "", // Sem ícone por enquanto
+    },
+    {
+        label: "Sobre",
+        href: "",
+        condition: () => true,
+        ariaLabel: "Ir para sobre",
+        animation: "animate-2",
+        order: "",
+        onClick: toggleMenu,
+    },
+    {
+        label: "Contatar",
+        href: "",
+        condition: () => true,
+        ariaLabel: "Ir para contatar",
+        animation: "animate-3",
+        order: "",
+        onClick: toggleMenu,
+    },
+    {
+        label: "Conta",
+        href: route("login"),
+        condition: () => user.value === null,
+        ariaLabel: "Fazer login",
+        animation: "animate-4",
+        order: "max-md:order-[-1]",
+        onClick: toggleMenu,
+    },
+    {
+        label: "Sair",
+        href: route("logout"),
+        condition: () => user.value !== null,
+        ariaLabel: "Sair da conta",
+        animation: "animate-4",
+        order: "max-md:order-[-1]",
+    },
+];
+const filteredNavLinks = computed(() =>
+    navLinks.filter((link) => link.condition())
+);
 </script>
 
 <template>
@@ -52,71 +100,33 @@ const logout = () => {
                     class="md:flex gap-x-4 font-roboto max-md:text-3xl text-xl max-md:z-50 max-md:absolute max-md:divide-y-2 max-md:divide-white/10 max-md:p-8 lg:gap-8 max-md:w-full"
                 >
                     <li
-                        v-if="!isHomePage"
-                        class="animate-slide-in opacity-0 animate-1"
+                        v-for="(link, index) in filteredNavLinks"
+                        :key="index"
+                        :class="[
+                            'animate-slide-in',
+                            'opacity-0',
+                            link.animation,
+                            link.order,
+                            {
+                                'lg:ml-8':
+                                    index === filteredNavLinks.length - 1,
+                            },
+                        ]"
+                        :style="{ animationDelay: `${index * 0.2}s` }"
                     >
                         <a
-                            @click.stop="toggleMenu"
+                            @click.stop="link.onClick"
                             class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            href="/"
-                            >Home</a
+                            :href="link.href"
+                            :aria-label="link.ariaLabel"
                         >
-                    </li>
-                    <li class="animate-slide-in opacity-0 animate-1">
-                        <a
-                            @click.stop="toggleMenu"
-                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            href="/"
-                            >Serviços</a
-                        >
-                    </li>
-                    <li class="animate-slide-in opacity-0 animate-2">
-                        <a
-                            @click.stop="toggleMenu"
-                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            href="/"
-                            >Sobre</a
-                        >
-                    </li>
-                    <li class="animate-slide-in opacity-0 animate-3">
-                        <a
-                            @click.stop="toggleMenu"
-                            class="btn text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            href="/"
-                            >Contatar</a
-                        >
-                    </li>
-                    <li
-                        v-if="user === null"
-                        class="animate-slide-in opacity-0 animate-4 max-md:order-[-1]"
-                    >
-                        <a
-                            @click.stop="toggleMenu"
-                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            :href="
-                                user !== null ? route('home') : route('login')
-                            "
-                            :aria-label="
-                                user !== null
-                                    ? 'Ir para a página inicial'
-                                    : 'Criar uma nova conta'
-                            "
-                            >{{ user !== null ? "Home" : "Login" }}</a
-                        >
-                    </li>
-                    <li
-                        v-if="user !== null"
-                        class="animate-slide-in opacity-0 animate-4"
-                    >
-                        <a
-                            @click.prevent="logout"
-                            class="text-white rounded-lg md:p-2 md:hover:text-white/80 font-medium p-4 block md:px-2 md:py-2 md:after:content-[''] md:after:absolute md:after:bottom-0 md:after:left-1/2 md:after:h-0.5 after:w-0 md:after:bg-current md:after:transition-all md:after:duration-300 md:hover:after:w-full md:hover:after:left-0 md:transition ease-in md:hover:scale-110 max-md:hover:bg-white/10"
-                            :href="
-                                user !== null ? route('home') : route('login')
-                            "
-                            aria-label="Sair da conta"
-                        >
-                            {{ user !== null ? "Conta" : "Criar" }}
+                            <img
+                                v-if="link.fav"
+                                :src="link.fav"
+                                alt="ícone"
+                                class="w-5 h-5"
+                            />
+                            <span>{{ link.label }}</span>
                         </a>
                     </li>
                 </ul>
