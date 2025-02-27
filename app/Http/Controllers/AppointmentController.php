@@ -44,8 +44,7 @@ class AppointmentController extends Controller
                 'name.max' => ' nome deve ter no máximo 255 caracteres.',
                 'date.required' => '  data é obrigatória.',
                 'fone.required' => ' telefone é obrigatório',
-                'fone.min' => ' telefone deve ter pelo menos 13 caracteres.',
-                'fone.max' => ' telefone deve ter no máximo 15 caracteres.',
+                'fone.regex' => 'telefone deve ter 10 ou 11 dígitos (DD + número).',
                 'date.date' => ' data deve ser uma data válida.',
                 'time.required' => ' horário é obrigatório.',
                 'email.required' => ' email é obrigatório.',
@@ -59,7 +58,7 @@ class AppointmentController extends Controller
 
 
 
-            $fone = str_replace(['(', ')', ' ', '-'], '', $request->input('fone', ''));
+            $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
 
             $request->merge([
@@ -70,7 +69,7 @@ class AppointmentController extends Controller
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{8,11}$/'],
+                'fone' => ['required', 'regex:/^\d{10,11}$/'],
                 'date' => 'required|date|after_or_equal:today',
                 'time' => 'required|date_format:H:i',
             ], $messages);
@@ -89,7 +88,6 @@ class AppointmentController extends Controller
 
             return redirect()->route('home')->with('success', 'Consulta marcada!');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Captura erros de validação e retorna para o frontend via Inertia
             return redirect()->back()
                 ->withErrors($e->validator->errors())
                 ->withInput();
@@ -109,8 +107,7 @@ class AppointmentController extends Controller
                 'name.min' => 'O nome deve ter pelo menos 2 caracteres.',
                 'name.max' => 'O nome deve ter no máximo 255 caracteres.',
                 'date.required' => 'A data é obrigatória.',
-                'fone.min' => 'O telefone deve ter pelo menos 13 caracteres.',
-                'fone.max' => 'O telefone deve ter no máximo 15 caracteres.',
+                'fone.regex' => 'telefone deve ter 10 ou 11 dígitos (DD + número).',
                 'date.date' => 'A data deve ser uma data válida.',
                 'time.required' => 'O horário é obrigatório.',
                 'email.required' => 'O email é obrigatório.',
@@ -118,8 +115,7 @@ class AppointmentController extends Controller
             ];
 
 
-
-            $fone = str_replace(['(', ')', ' ', '-'], '', $request->input('fone', ''));
+            $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
 
             $request->merge([
@@ -130,7 +126,7 @@ class AppointmentController extends Controller
             $request->validate([
                 'name' => 'required|string|min:2|max:255',
                 'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{8,11}$/'],
+                'fone' => ['required', 'regex:/^\d{10,11}$/'],
                 'date' => 'required|date|after_or_equal:today',
                 'time' => 'required|date_format:H:i',
             ], $messages);
@@ -144,9 +140,14 @@ class AppointmentController extends Controller
                 'user_id' => $appointment->user_id,
             ]);
 
-            return response()->json(['message' => 'Consulta atualizada com Sucesso', 'appointment', $appointment], 200);
+            return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator->errors())
+                ->withInput();
         } catch (\Exception $e) {
-            return response()->json(['message' => $e], 500);
+            Log::error('Erro ao atualizar agendamento: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erro ao atualizar agendamento.');
         }
     }
 
@@ -163,11 +164,18 @@ class AppointmentController extends Controller
         $date = now()->toDateString();
         return AppointmentService::generateAvailableTimes($date);
     }
+
     public function getAvailableTimes(Request $request)
     {
         try {
+
             $date = $request->query('date');
+            if (!$date || !Carbon::canBeCreatedFromFormat($date, 'Y-m-d')) {
+                return response()->json(['message' => 'Data inválida.'], 400);
+            }
+
             $availableTimes = AppointmentService::generateAvailableTimes($date);
+
             return response()->json(['times' => $availableTimes], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
@@ -180,6 +188,7 @@ class AppointmentController extends Controller
         try {
             $date = $request->query('date');
             $reserves = Appointment::where('date', $date)->get();
+
             $reservations = $reserves->map(function ($reserved) {
                 return [
                     'id' => $reserved->id,
@@ -188,10 +197,16 @@ class AppointmentController extends Controller
 
                 ];
             });
-            $countReserves = count($reserves);
-            return response()->json(['reserved' => $reservations, 'quantity' => $countReserves], 200);
+
+            return response()->json(
+                [
+                    'reserved' => $reservations,
+                    'quantity' => $reserves->count()
+                ],
+                200
+            );
         } catch (\Exception $e) {
-            return response()->json(["message"  => $e]);
+            return response()->json(["message"  => $e->getMessage()], 500);
         }
     }
 

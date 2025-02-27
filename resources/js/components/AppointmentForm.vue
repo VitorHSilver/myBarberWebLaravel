@@ -4,11 +4,8 @@ import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
 import { computed, ref } from "vue";
 import InputError from "@/Components/InputError.vue";
-import { usePage } from "@inertiajs/vue3";
 
-const page = usePage();
-const timesSlot = page.props.timeSlot as string[];
-const errors = page.props.errors;
+const isSubmitting = ref(false);
 
 const {
     form,
@@ -19,7 +16,8 @@ const {
     cleanField,
     dateInput,
     isDateValid,
-} = useAppointmentForm({ timesSlot });
+    timesSlot,
+} = useAppointmentForm();
 
 const isButtonDisabled = computed(() => {
     return !isDateValid.value;
@@ -34,6 +32,7 @@ const handleSubmit = async () => {
         setTimeout(() => (notificationError.value = false), 3000);
         return;
     }
+    isSubmitting.value = true;
     form.post("/appointments", {
         onSuccess: () => {
             cleanField();
@@ -52,6 +51,7 @@ const handleSubmit = async () => {
                 life: 3000,
             });
         },
+        onFinish: () => (isSubmitting.value = false),
     });
 };
 </script>
@@ -59,7 +59,7 @@ const handleSubmit = async () => {
 <template>
     <form
         @submit.prevent="handleSubmit"
-        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:border-n max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
+        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
     >
         <div class="grid gap-4 p-2 max-sm:p-0 max-sm:gap-2 max-md:w-full">
             <h3
@@ -74,6 +74,7 @@ const handleSubmit = async () => {
                     placeholder="Nome"
                     v-model="form.name"
                     @input="form.errors.name = undefined"
+                    aria-label="Nome"
                 />
                 <InputError :message="form.errors.name" />
             </div>
@@ -84,6 +85,7 @@ const handleSubmit = async () => {
                     placeholder="Email"
                     v-model="form.email"
                     @input="form.errors.email = undefined"
+                    aria-label="Email"
                 />
                 <InputError :message="form.errors.email" />
             </div>
@@ -91,8 +93,9 @@ const handleSubmit = async () => {
                 <input
                     type="text"
                     class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
-                    placeholder="Fone"
+                    placeholder="DD + número"
                     v-model="form.fone"
+                    aria-label="Fone"
                     @input="
                         form.errors.fone = undefined;
                         formatPhoneNumber();
@@ -114,7 +117,11 @@ const handleSubmit = async () => {
                     <select
                         class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
                         v-model="form.time"
+                        aria-label="Horario"
                     >
+                        <option v-if="timesSlot.length === 0" disabled>
+                            Nenhum horário disponível
+                        </option>
                         <option disabled value="">Horarios</option>
                         <option
                             v-for="times in timesSlot"
@@ -126,12 +133,14 @@ const handleSubmit = async () => {
                     </select>
                 </div>
             </div>
+            <!-- :disabled="isButtonDisabled" -->
             <Button
                 ref="buttonInput"
                 class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"
-                :disabled="isButtonDisabled"
+                :disabled="isButtonDisabled || isSubmitting"
+                aria-label="Confirmar agendamento"
             >
-                Confirmar
+                {{ isSubmitting ? "Enviando..." : "Confirmar" }}
             </Button>
             <Transition name="slide-fade">
                 <span

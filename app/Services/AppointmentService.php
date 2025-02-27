@@ -7,7 +7,6 @@ use Carbon\Carbon;
 
 class AppointmentService
 {
-    // Acessar variáveis de ambiente
     private static function getEnvConfig()
     {
         return [
@@ -18,7 +17,6 @@ class AppointmentService
             'duration_cut' => (int) env('DURACAO_CORTE', 60),
         ];
     }
-
     // Função para gerar lista de horários baseados no expediente, excluindo almoço
     private static function generateHoursList(string $selectedDate): array
     {
@@ -41,7 +39,6 @@ class AppointmentService
         return $timetables;
     }
 
-    // Função para buscar horários agendados no banco
     private static function getBookedTimes(string $selectedDate): array
     {
         return Appointment::whereDate('date', $selectedDate)
@@ -52,10 +49,9 @@ class AppointmentService
             ->toArray();
     }
 
-    // Função principal para gerar horários disponíveis
     public static function generateAvailableTimes(string $selectedDate): array
     {
-        // Validação de entrada
+    
         if (!$selectedDate || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
             throw new \InvalidArgumentException('Data inválida');
         }
@@ -63,19 +59,18 @@ class AppointmentService
         $today = Carbon::today()->toDateString();
         $isToday = $selectedDate === $today;
         $now = Carbon::now();
-
-        // Ajuste se fora do expediente (somente para hoje)
         $config = self::getEnvConfig();
         $endOfficeCheck = Carbon::parse("{$selectedDate} {$config['end_exp']}");
 
-        // Se for hoje e o horário atual for após o fim do expediente, não retornar horários
+
+        //fim do expediente, não retornar horários
         if ($isToday && $now->gt($endOfficeCheck)) {
             return []; // Retorna array vazio, indicando que não há horários disponíveis
         }
 
-        if ($isToday && $now > $endOfficeCheck) {
-            $now = Carbon::parse("{$selectedDate} {$config['start_exp']}");
-        }
+        // if ($isToday && $now > $endOfficeCheck) {
+        //     $now = Carbon::parse("{$selectedDate} {$config['start_exp']}");
+        // }
 
 
         $timetables = self::generateHoursList($selectedDate);
@@ -92,10 +87,10 @@ class AppointmentService
             $isPast = $isToday && $currentTime < $now;
             return !$isBooked && !$isPast;
         });
-        return array_values($filtered); // Reindexa o array
+        return array_values($filtered); 
     }
 
-    // Função para listar reservas do dia
+
     public static function reservationOfDay(string $selectedDate): array
     {
         $appointments = Appointment::whereDate('date', $selectedDate)->get();
