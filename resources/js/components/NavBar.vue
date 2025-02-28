@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router, usePage } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { LogOut } from "lucide-vue-next";
+import { computed, ref, resolveDirective } from "vue";
 
 const isMenuVisible = ref(false);
 
@@ -51,7 +52,7 @@ const navLinks = [
         onClick: toggleMenu,
     },
     {
-        label: "Conta",
+        label: "Login",
         href: route("login"),
         condition: () => user.value === null,
         ariaLabel: "Fazer login",
@@ -60,12 +61,13 @@ const navLinks = [
         onClick: toggleMenu,
     },
     {
-        label: "Sair",
-        href: route("logout"),
+        label: "Minha Conta",
+        href: route("dashboard"),
         condition: () => user.value !== null,
         ariaLabel: "Sair da conta",
         animation: "animate-4",
         order: "max-md:order-[-1]",
+        onClick: () => {},
     },
 ];
 const filteredNavLinks = computed(() =>
@@ -153,8 +155,37 @@ const filteredNavLinks = computed(() =>
     max-width: 400px;
     max-height: 200px;
 }
-ul :nth-child(4) {
+/* Remover o sublinhado do último link */
+ul li:last-child a::after {
+    content: none !important;
+}
+
+/* Estilização específica para o quarto link (Login ou Minha Conta) */
+ul li:nth-child(4) a {
     margin-left: 20%;
+}
+
+@media (min-width: 768px) {
+    ul li:nth-child(4) a {
+        transition: all 0.5s ease;
+        color: #fff;
+        border: 3px solid white;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 1;
+        font-size: 17px;
+        background-color: transparent;
+        padding: 10px;
+        outline: none;
+        border-radius: 4px;
+        margin-left: 0%;
+        letter-spacing: 0.4rem;
+    }
+
+    ul li:nth-child(4) a:hover {
+        color: #001f3f;
+        background-color: #fff;
+    }
 }
 @media (max-width: 1160px) {
     ul :nth-child(4) {
@@ -168,6 +199,11 @@ ul :nth-child(4) {
 }
 @media (max-width: 878px) {
     ul :nth-child(4) {
+        margin-left: 0%;
+    }
+}
+@media (max-width: 768px) {
+    ul li:nth-child(4) a {
         margin-left: 0%;
     }
 }

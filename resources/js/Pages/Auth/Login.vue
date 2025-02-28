@@ -89,23 +89,38 @@ const submit = () => {
                         Criar Conta
                     </Link>
                 </div>
-                
+
                 <PrimaryButton
-                class="text-center text-lg uppercase bg-black text-white mt-4"
-                :class="{ 'opacity-25': form.processing }"
-                severity="ghost"
-                :disabled="form.processing"
+                    class="text-center text-lg uppercase bg-black text-white mt-4"
+                    :class="{ 'opacity-25': form.processing }"
+                    severity="ghost"
+                    :disabled="form.processing"
                 >
-                Logar
-            </PrimaryButton>
-            <div class="flex items-center gap-2 my-4">
-                <span class="flex-1 h-px bg-gray-300"></span>
-                <p class="text-gray-500 text-sm">
-                    Ou faça login com o seu e-mail
-                </p>
-                <span class="flex-1 h-px bg-gray-300"></span>
-            </div>
+                    Logar
+                </PrimaryButton>
+                <div class="flex items-center gap-2 my-4">
+                    <span class="flex-1 h-px bg-gray-300"></span>
+                    <p class="text-gray-500 text-sm">
+                        Ou faça login com o seu e-mail
+                    </p>
+                    <span class="flex-1 h-px bg-gray-300"></span>
+                </div>
             </div>
         </form>
+        <div class="flex justify-center">
+            <a :href="route('auth.google')">
+                <button
+                    class="inline-flex items-center border rounded-md text-lg p-2 w-auto"
+                >
+                    <img
+                        src="/google.png"
+                        width="20px"
+                        alt="logo"
+                        class="mr-2"
+                    />
+                    Google
+                </button>
+            </a>
+        </div>
     </GuestLayout>
 </template>

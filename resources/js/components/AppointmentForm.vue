@@ -67,7 +67,7 @@ const handleSubmit = async () => {
                     v-model="form.name"
                     @input="form.errors.name = undefined"
                     aria-label="Nome"
-                    autocomplete="given-name"
+                    autocomplete="username"
                 />
                 <InputError :message="form.errors.name" />
             </div>
