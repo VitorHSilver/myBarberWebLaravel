@@ -4,7 +4,7 @@
         version="1.1"
         xmlns:xlink="http://www.w3.org/1999/xlink"
         width="2000"
-        height="500"
+        height="800"
         viewBox="0 0 2000 116"
     >
         <svg

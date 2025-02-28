@@ -51,13 +51,6 @@ class AppointmentController extends Controller
                 'email.email' => 'Insira um email válido.',
             ];
 
-            // Vincular todos os agendamentos com o mesmo email ao usuário
-            // Appointment::where('email', strtolower($request->email))
-            // ->whereNull('user_id')
-            // ->update(['user_id' => $user->id]);
-
-
-
             $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
 
@@ -74,8 +67,14 @@ class AppointmentController extends Controller
                 'time' => 'required|date_format:H:i',
             ], $messages);
 
-            // Verificar se o email existe no modelo User
-            $user = User::where('email', strtolower($request->email))->first();
+            // Priorizar o usuário logado, se existir
+            $userId = auth()->id();
+
+            // Se não houver usuário logado, buscar pelo email
+            if (!$userId) {
+                $user = User::where('email', strtolower($request->email))->first();
+                $userId = $user ? $user->id : null;
+            }
 
             $appointment = Appointment::create([
                 'name' => strtolower($request->name),
@@ -131,13 +130,21 @@ class AppointmentController extends Controller
                 'time' => 'required|date_format:H:i',
             ], $messages);
 
+            // Priorizar o usuário logado, se existir
+            // $userId = auth()->user() ? auth()->user()->id : null;
+            $userId = auth()->id();
+
+            if (!$userId) {
+                $user = User::where('email', strtolower($request->email))->first();
+                $userId = $user ? $user->id : null;
+            }
             $appointment->update([
                 'name' => strtolower($request->name),
                 'email' => strtolower($request->email),
                 'fone' => $request->fone,
                 'date' => $request->date,
                 'time' => $request->time,
-                'user_id' => $appointment->user_id,
+                'user_id' =>  $userId ?? $appointment->user_id,
             ]);
 
             return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
@@ -194,6 +201,7 @@ class AppointmentController extends Controller
                     'id' => $reserved->id,
                     'name' => $reserved->name,
                     'time' => Carbon::parse($reserved->time)->format('H:i'),
+                    'email' => $reserved->email,
 
                 ];
             });

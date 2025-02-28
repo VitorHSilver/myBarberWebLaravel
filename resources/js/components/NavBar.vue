@@ -10,6 +10,7 @@ function toggleMenu() {
 }
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+
 const isHomePage = computed(() => page.component === "Agenda");
 
 const navLinks = [
@@ -61,7 +62,7 @@ const navLinks = [
         onClick: toggleMenu,
     },
     {
-        label: "Minha Conta",
+        label: user.value !== null ? user.value.name : "Minha conta",
         href: route("dashboard"),
         condition: () => user.value !== null,
         ariaLabel: "Sair da conta",
