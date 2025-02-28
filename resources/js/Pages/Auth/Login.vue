@@ -34,11 +34,6 @@ const submit = () => {
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
-        <div class="flex items-center gap-2 my-4">
-            <span class="flex-1 h-px bg-gray-300"></span>
-            <p class="text-gray-500 text-sm">Ou faça login com o seu e-mail</p>
-            <span class="flex-1 h-px bg-gray-300"></span>
-        </div>
         <form @submit.prevent="submit" class="">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -94,15 +89,22 @@ const submit = () => {
                         Criar Conta
                     </Link>
                 </div>
-
+                
                 <PrimaryButton
-                    class="text-center text-lg uppercase bg-black text-white mt-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    severity="ghost"
-                    :disabled="form.processing"
+                class="text-center text-lg uppercase bg-black text-white mt-4"
+                :class="{ 'opacity-25': form.processing }"
+                severity="ghost"
+                :disabled="form.processing"
                 >
-                    Logar
-                </PrimaryButton>
+                Logar
+            </PrimaryButton>
+            <div class="flex items-center gap-2 my-4">
+                <span class="flex-1 h-px bg-gray-300"></span>
+                <p class="text-gray-500 text-sm">
+                    Ou faça login com o seu e-mail
+                </p>
+                <span class="flex-1 h-px bg-gray-300"></span>
+            </div>
             </div>
         </form>
     </GuestLayout>
