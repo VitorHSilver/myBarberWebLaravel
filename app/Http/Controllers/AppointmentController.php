@@ -10,14 +10,21 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Validation\ValidationException;
+
 
 class AppointmentController extends Controller
 {
+    private $appointment;
 
+    public function __construct(Appointment $appointment)
+    {
+        $this->appointment = $appointment;
+    }
 
     public function index()
     {
-        $timeSlot = $this->getAvailableTimesForToday();
+        $timeSlot = AppointmentService::getAvailableTimesForToday();
 
         return Inertia::render('Agenda', [
             'timeSlot' => $timeSlot
@@ -27,7 +34,7 @@ class AppointmentController extends Controller
     // Criar depois
     public function show($id)
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = $this->appointment->getById($id);
         return response()->json($appointment, 200);
 
         // return Inertia::render('AppointmentShow', [
@@ -54,7 +61,7 @@ class AppointmentController extends Controller
                 $userId = $user ? $user->id : null;
             }
 
-            Appointment::create([
+            $this->appointment->create([
                 'name' => strtolower($request->name),
                 'email' => strtolower($request->email),
                 'fone' => $fone,
@@ -64,7 +71,7 @@ class AppointmentController extends Controller
             ]);
 
             return redirect()->route('home')->with('success', 'Consulta marcada!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator->errors())
                 ->withInput();
@@ -77,7 +84,7 @@ class AppointmentController extends Controller
     public function update(AppointmentRequest $request, $id)
     {
         try {
-            $appointment = Appointment::findOrFail($id);
+            $appointment = $this->appointment->findOrFail($id);
 
             $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
@@ -103,7 +110,7 @@ class AppointmentController extends Controller
             ]);
 
             return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator->errors())
                 ->withInput();
@@ -115,17 +122,13 @@ class AppointmentController extends Controller
 
     public function destroy($id)
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = $this->appointment->findOrFail($id);
         $appointment->delete();
 
         return redirect()->route('home')->with('success', 'Consulta excluída com sucesso!');
     }
 
-    private function getAvailableTimesForToday()
-    {
-        $date = now()->toDateString();
-        return AppointmentService::generateAvailableTimes($date);
-    }
+
 
     public function getAvailableTimes(Request $request)
     {
@@ -149,25 +152,8 @@ class AppointmentController extends Controller
     {
         try {
             $date = $request->query('date');
-            $reserves = Appointment::where('date', $date)->get();
-
-            $reservations = $reserves->map(function ($reserved) {
-                return [
-                    'id' => $reserved->id,
-                    'name' => $reserved->name,
-                    'time' => Carbon::parse($reserved->time)->format('H:i'),
-                    'email' => $reserved->email,
-
-                ];
-            });
-
-            return response()->json(
-                [
-                    'reserved' => $reservations,
-                    'quantity' => $reserves->count()
-                ],
-                200
-            );
+            $reservations = $this->appointment->getReservationsByDate($date);
+            return response()->json(['reserved' => $reservations, 'quantity' => $reservations->count()], 200);
         } catch (\Exception $e) {
             return response()->json(["message"  => $e->getMessage()], 500);
         }
@@ -175,7 +161,12 @@ class AppointmentController extends Controller
 
     public function getAllAppointment()
     {
-        $appointments = Appointment::all();
-        return response()->json($appointments, 200);
+        try {
+
+            $appointments = $this->appointment->getAllAppointments();
+            return response()->json($appointments, 200);
+        } catch (\Exception $e) {
+            return response()->json(["message"  => $e->getMessage()], 500);
+        }
     }
 }

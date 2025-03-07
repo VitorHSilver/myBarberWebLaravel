@@ -51,7 +51,7 @@ class AppointmentService
 
     public static function generateAvailableTimes(string $selectedDate): array
     {
-    
+
         if (!$selectedDate || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
             throw new \InvalidArgumentException('Data inválida');
         }
@@ -87,7 +87,7 @@ class AppointmentService
             $isPast = $isToday && $currentTime < $now;
             return !$isBooked && !$isPast;
         });
-        return array_values($filtered); 
+        return array_values($filtered);
     }
 
 
@@ -108,5 +108,11 @@ class AppointmentService
             'reservations' => $reservations,
             'quantityReservations' => $quantityReservations,
         ];
+    }
+
+    public static function getAvailableTimesForToday()
+    {
+        $date = now()->toDateString();
+        return self::generateAvailableTimes($date);
     }
 }
