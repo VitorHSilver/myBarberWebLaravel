@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\User;
 use App\Services\AppointmentService;
@@ -35,21 +36,9 @@ class AppointmentController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(AppointmentRequest $request)
     {
         try {
-            $messages = [
-                'name.required' => ' nome é obrigatório.',
-                'name.min' => ' nome deve ter pelo menos 2 caracteres.',
-                'name.max' => ' nome deve ter no máximo 255 caracteres.',
-                'date.required' => '  data é obrigatória.',
-                'fone.required' => ' telefone é obrigatório',
-                'fone.regex' => 'telefone deve ter 10 ou 11 dígitos (DD + número).',
-                'date.date' => ' data deve ser uma data válida.',
-                'time.required' => ' horário é obrigatório.',
-                'email.required' => ' email é obrigatório.',
-                'email.email' => 'Insira um email válido.',
-            ];
 
             $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
@@ -59,24 +48,14 @@ class AppointmentController extends Controller
                 'time' => $time,
             ]);
 
-            $request->validate([
-                'name' => 'required|string|min:2|max:255',
-                'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{10,11}$/'],
-                'date' => 'required|date|after_or_equal:today',
-                'time' => 'required|date_format:H:i',
-            ], $messages);
-
-            // Priorizar o usuário logado, se existir
             $userId = auth()->id();
 
-            // Se não houver usuário logado, buscar pelo email
             if (!$userId) {
                 $user = User::where('email', strtolower($request->email))->first();
                 $userId = $user ? $user->id : null;
             }
 
-            $appointment = Appointment::create([
+            Appointment::create([
                 'name' => strtolower($request->name),
                 'email' => strtolower($request->email),
                 'fone' => $fone,
@@ -96,23 +75,10 @@ class AppointmentController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(AppointmentRequest $request, $id)
     {
         try {
             $appointment = Appointment::findOrFail($id);
-
-            $messages = [
-                'name.required' => 'O nome é obrigatório.',
-                'name.min' => 'O nome deve ter pelo menos 2 caracteres.',
-                'name.max' => 'O nome deve ter no máximo 255 caracteres.',
-                'date.required' => 'A data é obrigatória.',
-                'fone.regex' => 'telefone deve ter 10 ou 11 dígitos (DD + número).',
-                'date.date' => 'A data deve ser uma data válida.',
-                'time.required' => 'O horário é obrigatório.',
-                'email.required' => 'O email é obrigatório.',
-                'email.email' => 'Insira um email válido.',
-            ];
-
 
             $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
@@ -122,16 +88,6 @@ class AppointmentController extends Controller
                 'time' => $time,
             ]);
 
-            $request->validate([
-                'name' => 'required|string|min:2|max:255',
-                'email' => 'required|email',
-                'fone' => ['required', 'regex:/^\d{10,11}$/'],
-                'date' => 'required|date|after_or_equal:today',
-                'time' => 'required|date_format:H:i',
-            ], $messages);
-
-            // Priorizar o usuário logado, se existir
-            // $userId = auth()->user() ? auth()->user()->id : null;
             $userId = auth()->id();
 
             if (!$userId) {

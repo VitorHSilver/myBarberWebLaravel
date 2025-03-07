@@ -184,7 +184,7 @@ ul li:nth-child(4) a {
     }
 
     ul li:nth-child(4) a:hover {
-        color: #001f3f;
+        color: #451E0E;
         background-color: #fff;
     }
 }
