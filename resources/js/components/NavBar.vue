@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { router, usePage } from "@inertiajs/vue3";
-import { LogOut } from "lucide-vue-next";
-import { computed, ref, resolveDirective } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const isMenuVisible = ref(false);
 
@@ -79,7 +78,7 @@ const filteredNavLinks = computed(() =>
 <template>
     <div class="container">
         <header
-            class="grid grid-cols-2 mt-6 items-center max-md:flex max-md:justify-around"
+            class="grid grid-cols-2 mt-6 items-center max-md:flex max-md:justify-around max-smallscreen:flex max-smallscreen:min-w-96"
         >
             <a href="./">
                 <img
@@ -156,11 +155,18 @@ const filteredNavLinks = computed(() =>
     max-width: 400px;
     max-height: 200px;
 }
+
 /* Remover o sublinhado do último link */
 ul li:last-child a::after {
     content: none !important;
 }
-
+@media (max-width: 767px) {
+    ul {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
 /* Estilização específica para o quarto link (Login ou Minha Conta) */
 ul li:nth-child(4) a {
     margin-left: 20%;
@@ -184,7 +190,7 @@ ul li:nth-child(4) a {
     }
 
     ul li:nth-child(4) a:hover {
-        color: #451E0E;
+        color: #451e0e;
         background-color: #fff;
     }
 }
@@ -208,4 +214,5 @@ ul li:nth-child(4) a {
         margin-left: 0%;
     }
 }
+
 </style>

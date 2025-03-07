@@ -51,7 +51,7 @@ const handleSubmit = async () => {
 <template>
     <form
         @submit.prevent="handleSubmit"
-        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
+        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[24rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 max-lg:mt-0 max-lg:mb-8  xl:mt-24 max-xl:mt-22  max-smallscreen:shadow-none md:ml-32 max-md:grid max-md:gap-4 md:max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl max-md:m-auto"
     >
         <div class="grid gap-4 p-2 max-sm:p-0 max-sm:gap-2 max-md:w-full">
             <h3
@@ -62,7 +62,7 @@ const handleSubmit = async () => {
             <div>
                 <input
                     type="text"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input relative"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 max-sm:mb-1 input relative"
                     placeholder="Nome"
                     v-model="form.name"
                     @input="form.errors.name = undefined"
@@ -74,7 +74,7 @@ const handleSubmit = async () => {
             <div>
                 <input
                     type="email"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50  max-sm:mb-1"
                     placeholder="Email"
                     v-model="form.email"
                     @input="form.errors.email = undefined"
@@ -86,7 +86,7 @@ const handleSubmit = async () => {
             <div>
                 <input
                     type="text"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50  max-sm:mb-1"
                     placeholder="DD + número"
                     v-model="form.fone"
                     aria-label="Fone"
@@ -101,7 +101,7 @@ const handleSubmit = async () => {
             <div class="flex max-md:flex-col max-md:gap-4">
                 <input
                     type="date"
-                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
+                    class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full  max-sm:mb-1"
                     v-model="form.date"
                     @change="checkDate"
                     @focus="checkDate"

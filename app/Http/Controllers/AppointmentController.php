@@ -39,7 +39,6 @@ class AppointmentController extends Controller
     public function store(AppointmentRequest $request)
     {
         try {
-
             $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
             $time = $request->input('time', '');
 
