@@ -46,14 +46,6 @@ class AppointmentController extends Controller
     public function store(AppointmentRequest $request)
     {
         try {
-            $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
-            $time = $request->input('time', '');
-
-            $request->merge([
-                'fone' => $fone,
-                'time' => $time,
-            ]);
-
             $userId = auth()->id();
 
             if (!$userId) {
@@ -64,9 +56,9 @@ class AppointmentController extends Controller
             $this->appointment->create([
                 'name' => strtolower($request->name),
                 'email' => strtolower($request->email),
-                'fone' => $fone,
+                'fone' => $request->fone,
                 'date' => $request->date,
-                'time' => $time,
+                'time' => $request->time,
                 'user_id' => $user ? $user->id : null,
             ]);
 
@@ -85,14 +77,6 @@ class AppointmentController extends Controller
     {
         try {
             $appointment = $this->appointment->findOrFail($id);
-
-            $fone = preg_replace('/[^0-9]/', '', $request->input('fone', ''));
-            $time = $request->input('time', '');
-
-            $request->merge([
-                'fone' => $fone,
-                'time' => $time,
-            ]);
 
             $userId = auth()->id();
 
@@ -128,7 +112,8 @@ class AppointmentController extends Controller
         return redirect()->route('home')->with('success', 'Consulta excluída com sucesso!');
     }
 
-
+    
+    //api
 
     public function getAvailableTimes(Request $request)
     {
@@ -147,7 +132,6 @@ class AppointmentController extends Controller
         }
     }
 
-    //api
     public function getReservationsOfDay(Request $request)
     {
         try {

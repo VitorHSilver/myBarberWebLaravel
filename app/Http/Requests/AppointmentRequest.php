@@ -44,4 +44,11 @@ class AppointmentRequest extends FormRequest
             'email.email' => 'Insira um email válido.',
         ];
     }
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'fone' => preg_replace('/[^0-9]/', '', $this->input('fone', '')),
+            'time' => $this->input('time', ''), // Garante que time tenha um valor, mas validação cuidará do resto
+        ]);
+    }
 }

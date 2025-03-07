@@ -46,14 +46,6 @@ Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->name
 Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
 
-// Rota para buscar horários disponíveis 
-Route::get('/free-times', [AppointmentController::class, 'getAvailableTimes'])->name('free-times');
-
-// Rota para buscar reservas do dia (pode ser mantida como API ou passada via props)
-Route::get('/reserved-times', [AppointmentController::class, 'getReservationsOfDay'])->name('reserved-times');
-
-
-
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 

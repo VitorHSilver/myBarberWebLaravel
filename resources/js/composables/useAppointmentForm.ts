@@ -77,7 +77,7 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
 
     const fetchTimeSlots = async (date: string) => {
         try {
-            const response = await axios.get(`/free-times?date=${date}`);
+            const response = await axios.get(`api/available-times?date=${date}`);
             timesSlot.value = response.data.times; // Atualiza timesSlot com os horários retornados
         } catch (error) {
             console.error("Erro ao buscar horários:", error);
