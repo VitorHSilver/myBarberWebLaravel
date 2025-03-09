@@ -18,12 +18,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="md:grid grid-cols-2">
-        <div v-if="!isSmallScreen" class=" flex items-center">
+    <div class="md:grid grid-cols-[1200px_auto]">
+        <div v-if="!isSmallScreen" class="flex items-center">
             <img src="/barber-high-resolution-logo-transparent.svg" alt="" />
         </div>
-        
-        
+
         <div
             class="flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0 bg-white"
         >

@@ -28,7 +28,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Barber | Login" />
+    <Head title="Login" />
 
     <GuestLayout>
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
@@ -101,7 +101,7 @@ const submit = () => {
                 <div class="flex items-center gap-2 my-4">
                     <span class="flex-1 h-px bg-gray-300"></span>
                     <p class="text-gray-500 text-sm">
-                        Ou faça login com o seu e-mail
+                        Ou faça login com sua conta
                     </p>
                     <span class="flex-1 h-px bg-gray-300"></span>
                 </div>

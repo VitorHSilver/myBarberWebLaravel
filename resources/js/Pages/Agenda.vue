@@ -8,7 +8,7 @@ import Toast from "@/Layouts/Toast.vue";
 const { showVideo } = useAppointmentForm();
 </script>
 <template>
-    <Head title="Barber | Home" />
+    <Head title="Home" />
     <NavBar />
     <Toast />
     <main class="conteudo container" id="home">
