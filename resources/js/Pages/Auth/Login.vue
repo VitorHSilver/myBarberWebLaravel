@@ -133,7 +133,7 @@ const submit = () => {
 <style scoped>
 /* Estilo para o InputText em foco */
 :deep(.p-inputtext:focus) {
-    border-color: gray !important;
+    border-color: #9f9f9f !important;
     box-shadow: none !important;
 }
 label {
