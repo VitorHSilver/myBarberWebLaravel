@@ -66,6 +66,7 @@ const handleSubmit = async () => {
                     type="text"
                     class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 max-sm:mb-1 input relative"
                     placeholder="Nome"
+                    autofocus
                     v-model="form.name"
                     @input="form.errors.name = undefined"
                     aria-label="Nome"

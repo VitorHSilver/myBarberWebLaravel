@@ -2,10 +2,10 @@
 import Checkbox from "@/Components/Checkbox.vue";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import FloatLabel from "primevue/floatlabel";
+import InputText from "primevue/inputtext";
 
 defineProps<{
     canResetPassword?: boolean;
@@ -34,37 +34,42 @@ const submit = () => {
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
-        <form @submit.prevent="submit" class="">
+        <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-
+                <FloatLabel variant="on">
+                    <InputText
+                        id="email"
+                        type="email"
+                        class="mt-1 block w-full"
+                        v-model="form.email"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    />
+                    <label for="email" style="color: gray !important"
+                        >Email</label
+                    >
+                </FloatLabel>
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Senha" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
-
+                <FloatLabel variant="on">
+                    <InputText
+                        id="password"
+                        type="password"
+                        class="mt-1 block w-full"
+                        v-model="form.password"
+                        required
+                        autocomplete="current-password"
+                    />
+                    <label for="password"
+                        >Senha</label
+                    >
+                </FloatLabel>
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
+
             <div class="mt-4 flex justify-between">
                 <label>
                     <Checkbox name="remember" v-model:checked="form.remember" />
@@ -124,10 +129,14 @@ const submit = () => {
         </div>
     </GuestLayout>
 </template>
+
 <style scoped>
-input:focus {
-    border-color: gray;
-    -webkit-box-shadow: none;
-    box-shadow: none;
+/* Estilo para o InputText em foco */
+:deep(.p-inputtext:focus) {
+    border-color: gray !important;
+    box-shadow: none !important;
+}
+label {
+    color: #9f9f9f !important;
 }
 </style>
