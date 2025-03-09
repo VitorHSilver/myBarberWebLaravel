@@ -46,7 +46,7 @@ const submit = () => {
                         autofocus
                         autocomplete="username"
                     />
-                    <label for="email" style="color: gray !important"
+                    <label for="email"
                         >Email</label
                     >
                 </FloatLabel>
