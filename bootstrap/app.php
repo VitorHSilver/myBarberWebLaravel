@@ -1,7 +1,7 @@
 <?php
 
 use App\Providers\AppServiceProvider;
-use Illuminate\Auth\AuthServiceProvider;
+use App\Providers\AuthServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,16 +21,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-        ]);
+    ]);
 
         // Middlewares específicos para o grupo 'api'
         $middleware->api(append: [
             \App\Http\Middleware\CorsMiddleware::class,
         ]);
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'professional' => \App\Http\Middleware\EnsureUserIsProfessional::class,
+        ]);
     })
     ->withProviders([
-        AppServiceProvider::class,
         AuthServiceProvider::class,
+        AppServiceProvider::class,
     ])
     ->withExceptions(function (Exceptions $exceptions) {
         //

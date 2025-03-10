@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\AppointmentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
@@ -31,6 +32,11 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function userDashboard()
+    {
+        return inertia('User/Dashboard');
+    }
+
     // Criar depois
     public function show($id)
     {
@@ -46,7 +52,9 @@ class AppointmentController extends Controller
     public function store(AppointmentRequest $request)
     {
         try {
-            $userId = auth()->id();
+            /** @var \Illuminate\Contracts\Auth\Guard $auth */
+            $auth = auth();
+            $userId = $auth->id();
 
             if (!$userId) {
                 $user = User::where('email', strtolower($request->email))->first();
@@ -78,7 +86,9 @@ class AppointmentController extends Controller
         try {
             $appointment = $this->appointment->findOrFail($id);
 
-            $userId = auth()->id();
+            /** @var \Illuminate\Contracts\Auth\Guard $auth */
+            $auth = auth();
+            $userId = $auth->id();
 
             if (!$userId) {
                 $user = User::where('email', strtolower($request->email))->first();
@@ -112,7 +122,7 @@ class AppointmentController extends Controller
         return redirect()->route('home')->with('success', 'Consulta excluída com sucesso!');
     }
 
-    
+
     //api
 
     public function getAvailableTimes(Request $request)

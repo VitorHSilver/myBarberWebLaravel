@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Appointment;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -51,26 +51,16 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    /**
-     * Verifica se o usuário é um profissional.
-     *
-     * @return bool
-     */
     public function isProfessional(): bool
     {
         return $this->role === 'professional';
     }
 
-    /**
-     * Verifica se o usuário é um usuário comum.
-     *
-     * @return bool
-     */
     public function isUser(): bool
     {
         return $this->role === 'user';
     }
-    
+
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
