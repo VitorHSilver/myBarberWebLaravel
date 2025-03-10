@@ -24,9 +24,9 @@ class SocialAuthController extends Controller
 
             // Criar ou atualizar o usuário com base no e-mail
             $user = User::updateOrCreate(
-                ['email' => $googleUser->email],
+                ['email' => strtolower($googleUser->email)],
                 [
-                    'name' => $googleUser->name,
+                    'name' => ucwords(strtolower($googleUser->name)),
                     'password' => bcrypt(Str::random(16)),
                 ]
             );

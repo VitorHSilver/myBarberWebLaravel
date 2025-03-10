@@ -28,8 +28,8 @@ class UserFactory extends Factory
         $faker = FakerFactory::create('pt_BR'); 
 
         return [
-            'name' => $faker->name(),
-            'email' => $faker->unique()->safeEmail(),
+            'name' => ucwords(strtolower($faker->name())),
+            'email' => strtolower($faker->unique()->safeEmail()),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

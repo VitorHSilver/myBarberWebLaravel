@@ -45,6 +45,32 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Verifica se o usuário é um profissional.
+     *
+     * @return bool
+     */
+    public function isProfessional(): bool
+    {
+        return $this->role === 'professional';
+    }
+
+    /**
+     * Verifica se o usuário é um usuário comum.
+     *
+     * @return bool
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+    
     public function appointments()
     {
         return $this->hasMany(Appointment::class);

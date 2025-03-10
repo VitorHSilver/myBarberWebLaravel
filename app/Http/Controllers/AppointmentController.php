@@ -54,7 +54,7 @@ class AppointmentController extends Controller
             }
 
             $this->appointment->create([
-                'name' => strtolower($request->name),
+                'name' => ucwords(strtolower($request->name)),
                 'email' => strtolower($request->email),
                 'fone' => $request->fone,
                 'date' => $request->date,
@@ -85,7 +85,7 @@ class AppointmentController extends Controller
                 $userId = $user ? $user->id : null;
             }
             $appointment->update([
-                'name' => strtolower($request->name),
+                'name' => ucwords(strtolower($request->name)),
                 'email' => strtolower($request->email),
                 'fone' => $request->fone,
                 'date' => $request->date,
