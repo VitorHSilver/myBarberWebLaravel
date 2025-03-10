@@ -21,7 +21,7 @@ const navLinks = [
         animation: "animate-1",
         order: "",
         onClick: toggleMenu,
-        fav: "",
+     
     },
     {
         label: "Serviços",
@@ -31,7 +31,7 @@ const navLinks = [
         animation: "animate-1",
         order: "",
         onClick: toggleMenu,
-        fav: "", // Sem ícone por enquanto
+        
     },
     {
         label: "Sobre",
@@ -123,8 +123,6 @@ const filteredNavLinks = computed(() =>
                             :aria-label="link.ariaLabel"
                         >
                             <img
-                                v-if="link.fav"
-                                :src="link.fav"
                                 alt="ícone"
                                 class="w-5 h-5"
                             />

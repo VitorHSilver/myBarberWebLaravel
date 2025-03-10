@@ -7,10 +7,14 @@ use App\Http\Controllers\ProfessionalController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', [AppointmentController::class, 'index'])->name('home'); // Página inicial com o formulário
+Route::get('/', [AppointmentController::class, 'index'])->name('home');
+Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->name('appointments.show');
+Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
+Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
+// Redireciona para a dashboard correta com base no role
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Redireciona para a dashboard correta com base no role
     Route::get('/dashboard', function () {
         /** @var \Illuminate\Contracts\Auth\Guard $auth */
         $auth = auth();
@@ -28,7 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rotas do Admin
     Route::middleware('admin')->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/admin/professionals', [AdminController::class, 'listProfessionals'])->name('admin.professionals');
         Route::post('/admin/professionals', [AdminController::class, 'storeProfessional'])->name('admin.professionals.store');
+        Route::put('/admin/professionals/{id}', [AdminController::class, 'updateProfessional'])->name('admin.professionals.update');
         Route::delete('/admin/professionals/{id}', [AdminController::class, 'destroyProfessional'])->name('admin.professionals.destroy');
     });
 

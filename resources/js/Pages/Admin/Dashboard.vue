@@ -18,9 +18,7 @@ import { Head } from "@inertiajs/vue3";
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <h1>Admin Dashboard</h1>
                     <p>Bem-vindo ao painel do Admin!</p>
-                    <!-- <button v-if="can.manageProfessionals">
-                        Adicionar Profissional
-                    </button> -->
+          
                 </div>
             </div>
         </div>
