@@ -130,8 +130,10 @@ const filteredNavLinks = computed(() =>
                             />
                             <span>{{ link.label }}</span>
                         </a>
+                        
                     </li>
                 </ul>
+                
             </nav>
             <button
                 id="mobile-button"

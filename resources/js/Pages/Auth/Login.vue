@@ -3,7 +3,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 import FloatLabel from "primevue/floatlabel";
 import InputText from "primevue/inputtext";
 
@@ -94,7 +94,6 @@ const submit = () => {
                         Criar Conta
                     </Link>
                 </div>
-
                 <PrimaryButton
                     class="text-center text-lg uppercase bg-black text-white mt-4"
                     :class="{ 'opacity-25': form.processing }"
@@ -103,6 +102,7 @@ const submit = () => {
                 >
                     Logar
                 </PrimaryButton>
+
                 <div class="flex items-center gap-2 my-4">
                     <span class="flex-1 h-px bg-gray-300"></span>
                     <p class="text-gray-500 text-sm">
