@@ -6,6 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import FloatLabel from "primevue/floatlabel";
 import InputText from "primevue/inputtext";
+import { onMounted, ref } from "vue";
 
 defineProps<{
     canResetPassword?: boolean;
@@ -22,9 +23,24 @@ const submit = () => {
     form.post(route("login"), {
         onFinish: () => {
             form.reset("password");
+            if (form.remember) {
+                const email = form.email;
+                localStorage.setItem("Email", email);
+            }
         },
     });
 };
+const passwordVisible = ref(false);
+
+const fillInEmail = (): string => {
+    return localStorage.getItem("Email") || "";
+};
+onMounted(() => {
+    const savedEmail = fillInEmail();
+    if (savedEmail) {
+        form.email = savedEmail;
+    }
+});
 </script>
 
 <template>
@@ -46,26 +62,34 @@ const submit = () => {
                         autofocus
                         autocomplete="username"
                     />
-                    <label for="email"
-                        >Email</label
-                    >
+                    <label for="email">Email</label>
                 </FloatLabel>
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4 relative">
                 <FloatLabel variant="on">
                     <InputText
                         id="password"
-                        type="password"
+                        :type="passwordVisible ? 'text' : 'password'"
                         class="mt-1 block w-full"
                         v-model="form.password"
                         required
                         autocomplete="current-password"
                     />
-                    <label for="password"
-                        >Senha</label
-                    >
+                    <div class="absolute top-2 right-2">
+                        <img
+                            :src="
+                                passwordVisible
+                                    ? 'icon/eye.svg'
+                                    : 'icon/eye_off.svg'
+                            "
+                            class="cursor-pointer"
+                            @click="passwordVisible = !passwordVisible"
+                        />
+                    </div>
+
+                    <label for="password">Senha</label>
                 </FloatLabel>
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
