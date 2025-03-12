@@ -4,9 +4,28 @@ import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Head } from "@inertiajs/vue3";
 import AppointmentForm from "@/components/AppointmentForm.vue";
 import Toast from "@/Layouts/Toast.vue";
+import "nprogress/nprogress.css";
+import { onMounted, ref } from "vue";
+import { isLoading, LoadingStatus } from "@/lib/utils";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const { showVideo } = useAppointmentForm();
+
+const isBackgroundLoaded = ref(false);
+
+const loadingStatus = new LoadingStatus();
+
+const onBackgroundLoaded = () => {
+    isBackgroundLoaded.value = true;
+    if (!isLoading.value) return;
+    loadingStatus.finishLoading();
+};
+
+onMounted(() => {
+    loadingStatus.initLoading();
+});
 </script>
+
 <template>
     <Head title="Home" />
     <NavBar />
@@ -15,6 +34,8 @@ const { showVideo } = useAppointmentForm();
         <div
             class="relative max-2xl:pt-32 px-8 pb-16 overflow-hidden text-white bg-gradient-to-t from-marrom-950/40 max-smallscreen:bg-gradient-to-tr max-smallscreen:from-transparent rounded-lg"
         >
+            <LoadingSpinner v-if="isLoading" />
+
             <video
                 v-if="showVideo"
                 id="video"
@@ -27,12 +48,14 @@ const { showVideo } = useAppointmentForm();
                 height="720"
                 src="output.webm"
                 aria-label="Vídeo de fundo mostrando um barbeiro trabalhando"
+                @loadeddata="onBackgroundLoaded"
             ></video>
             <img
                 v-else
                 src="bg-barber.jpg"
                 class="absolute inset-0 object-cover -z-10 size-full shadow-sm shadow-slate-700 m-auto mt-6 rounded-lg max-smallscreen:w-full max-smallscreen:h-44"
                 alt="Imagem de fundo mostrando uma barbearia tradicional"
+                @load="onBackgroundLoaded"
             />
 
             <AppointmentForm />
@@ -61,6 +84,7 @@ const { showVideo } = useAppointmentForm();
         max-width: 1024px;
     }
 }
+
 @media (max-width: 350px) {
     .conteudo {
         min-width: 40vh;

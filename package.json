@@ -33,6 +33,7 @@
         "primevue": "^4.3.0",
         "reka-ui": "^2.0.0",
         "tailwind-merge": "^3.0.2",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "vue-loading-overlay": "^6.0.6"
     }
 }
