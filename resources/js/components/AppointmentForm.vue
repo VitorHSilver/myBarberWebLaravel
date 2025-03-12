@@ -16,8 +16,6 @@ const {
     timesSlot,
 } = useAppointmentForm();
 
-console.log(timesSlot.value);
-
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
 

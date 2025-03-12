@@ -2,6 +2,7 @@ import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
+import { TimelineSlots } from "primevue";
 
 export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
     const currentDate = new Date().toLocaleDateString("en-CA");
@@ -21,7 +22,7 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
         time: "",
     });
 
-    const formatPhoneNumber = () => {
+    const formatPhoneNumber = (): void => {
         let fone = form.fone.replace(/\D/g, "");
         if (fone.length > 11) {
             fone = fone.slice(0, 11);
@@ -40,11 +41,17 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
         }
     };
 
-    const cleanField = () => {
+    const cleanField = (): void => {
         form.reset();
         form.date = currentDate;
         isDateValid.value = true;
     };
+
+    interface Holidays {
+        date: string;
+        name: string;
+        type: string;
+    }
 
     const isBusinessDay = async (dateString: string): Promise<boolean> => {
         try {
@@ -54,13 +61,11 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
             }
 
             const year = date.getFullYear();
-            const response = await axios.get(
+            const response = await axios.get<Holidays[]>(
                 `https://brasilapi.com.br/api/feriados/v1/${year}`
             );
-            const holidays = response.data;
-            const holidayDates = holidays.map(
-                (item: { date: string }) => item.date
-            );
+            const holidays: Holidays[] = response.data;
+            const holidayDates = holidays.map((item: Holidays) => item.date);
 
             const dayOfWeek = date.getDay();
             const formattedDate = date.toISOString().split("T")[0];
@@ -74,14 +79,18 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
             return false;
         }
     };
-
-    const fetchTimeSlots = async (date: string) => {
+    type TimeSlots = { times: string[] };
+    const fetchTimeSlots = async (date: string): Promise<TimeSlots> => {
         try {
-            const response = await axios.get(`api/available-times?date=${date}`);
-            timesSlot.value = response.data.times; // Atualiza timesSlot com os horários retornados
+            const response = await axios.get<TimeSlots>(
+                `api/available-times?date=${date}`
+            );
+            timesSlot.value = response.data.times;
+            return response.data;
         } catch (error) {
             console.error("Erro ao buscar horários:", error);
-            timesSlot.value = []; // Em caso de erro, limpa os horários
+            timesSlot.value = [];
+            return { times: [] };
         }
     };
     const checkDate = async (event: Event) => {

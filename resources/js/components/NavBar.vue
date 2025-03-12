@@ -20,8 +20,8 @@ const navLinks = [
         ariaLabel: "Ir para a página inicial",
         animation: "animate-1",
         order: "",
+        fav: null,
         onClick: toggleMenu,
-     
     },
     {
         label: "Serviços",
@@ -31,7 +31,6 @@ const navLinks = [
         animation: "animate-1",
         order: "",
         onClick: toggleMenu,
-        
     },
     {
         label: "Sobre",
@@ -66,7 +65,7 @@ const navLinks = [
         condition: () => user.value !== null,
         ariaLabel: "Sair da conta",
         animation: "animate-4",
-        order: "max-md:order-[-1]",
+        fav: null,
         onClick: () => {},
     },
 ];
@@ -122,16 +121,11 @@ const filteredNavLinks = computed(() =>
                             :href="link.href"
                             :aria-label="link.ariaLabel"
                         >
-                            <img
-                                alt="ícone"
-                                class="w-5 h-5"
-                            />
+                            <img v-if="link.fav" alt="ícone" class="w-5 h-5" />
                             <span>{{ link.label }}</span>
                         </a>
-                        
                     </li>
                 </ul>
-                
             </nav>
             <button
                 id="mobile-button"
@@ -214,5 +208,4 @@ ul li:nth-child(4) a {
         margin-left: 0%;
     }
 }
-
 </style>
