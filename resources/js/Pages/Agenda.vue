@@ -4,10 +4,10 @@ import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Head } from "@inertiajs/vue3";
 import Toast from "@/Layouts/Toast.vue";
 import { defineAsyncComponent, onMounted, ref } from "vue";
-import { isLoading, LoadingStatus } from "@/lib/utils";
+import { LoadingStatus } from "@/lib/utils";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-// Definindo o componente AppointmentForm como assíncrono
+
 const AppointmentFormAsync = defineAsyncComponent(
     () => import("@/components/AppointmentForm.vue")
 );
@@ -27,12 +27,11 @@ const onBackgroundLoaded = () => {
 
 onMounted(() => {
     loadingStatus.initLoading();
-    // O Suspense gerencia o carregamento, mas podemos adicionar um tempo mínimo
     setTimeout(() => {
         if (isBackgroundLoaded.value) {
             loadingStatus.finishLoading();
         }
-    }, 2000); // Tempo mínimo de 2 segundos
+    }, 2000); 
 });
 </script>
 
@@ -42,7 +41,7 @@ onMounted(() => {
     <Toast />
     <main class="conteudo container" id="home">
         <Suspense>
-            <!-- Conteúdo principal -->
+         
             <div
                 class="relative max-2xl:pt-32 px-8 pb-16 overflow-hidden text-white bg-gradient-to-t from-marrom-950/40 max-smallscreen:bg-gradient-to-tr max-smallscreen:from-transparent rounded-lg"
             >
@@ -68,7 +67,7 @@ onMounted(() => {
                     @load="onBackgroundLoaded"
                 />
 
-                <!-- Usar o componente assíncrono -->
+                
                 <AppointmentFormAsync />
 
                 <div
@@ -83,7 +82,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <!-- Fallback (exibido enquanto o conteúdo carrega) -->
+            
             <template #fallback>
                 <LoadingSpinner />
             </template>

@@ -18,11 +18,12 @@ const showingNavigationDropdown = ref(false);
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
                         <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
+                            <div
+                                class="hidden max-md:flex shrink-0 items-center"
+                            >
                                 <Link :href="route('home')">
                                     <ApplicationLogo
-                                        class="block h-9  w-auto fill-current text-gray-800"
+                                        class="block h-9 w-auto fill-current text-gray-800"
                                     />
                                 </Link>
                             </div>
@@ -37,12 +38,14 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Home
                                 </NavLink>
+                                <!-- // Remover -->
                                 <NavLink
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
                                     Dashboard
                                 </NavLink>
+                                <!-- // Remover -->
                             </div>
                         </div>
 
@@ -78,14 +81,14 @@ const showingNavigationDropdown = ref(false);
                                         <DropdownLink
                                             :href="route('profile.edit')"
                                         >
-                                            Profile
+                                            Perfil
                                         </DropdownLink>
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            Sair
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
@@ -136,6 +139,8 @@ const showingNavigationDropdown = ref(false);
                 </div>
 
                 <!-- Responsive Navigation Menu -->
+
+                <!-- Responsive Settings Options -->
                 <div
                     :class="{
                         block: showingNavigationDropdown,
@@ -143,16 +148,6 @@ const showingNavigationDropdown = ref(false);
                     }"
                     class="sm:hidden"
                 >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
                     <div class="border-t border-gray-200 pb-1 pt-4">
                         <div class="px-4">
                             <div class="text-base font-medium text-gray-800">
@@ -162,17 +157,25 @@ const showingNavigationDropdown = ref(false);
                                 {{ $page.props.auth.user.email }}
                             </div>
                         </div>
+                        <div class="mt-1 space-y-1 pb-1 pt-2">
+                            <ResponsiveNavLink
+                                :href="route('home')"
+                                :active="route().current('home')"
+                            >
+                                Home
+                            </ResponsiveNavLink>
+                        </div>
 
-                        <div class="mt-3 space-y-1">
+                        <div class="mt-1 space-y-1">
                             <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
+                                Perfil
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 :href="route('logout')"
                                 method="post"
                                 as="button"
                             >
-                                Log Out
+                                Sair
                             </ResponsiveNavLink>
                         </div>
                     </div>
@@ -181,7 +184,9 @@ const showingNavigationDropdown = ref(false);
 
             <!-- Page Heading -->
             <header class="bg-white shadow" v-if="$slots.header">
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <div
+                    class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 text-center"
+                >
                     <slot name="header" />
                 </div>
             </header>

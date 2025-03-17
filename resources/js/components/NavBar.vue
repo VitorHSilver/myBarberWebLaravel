@@ -63,7 +63,7 @@ const navLinks = [
         label: user.value !== null ? user.value.name : "Minha conta",
         href: route("dashboard"),
         condition: () => user.value !== null,
-        ariaLabel: "Sair da conta",
+        ariaLabel: "tela de Dashboard",
         animation: "animate-4",
         fav: null,
         onClick: () => {},
