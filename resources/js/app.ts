@@ -8,7 +8,7 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import Aura from "@primeuix/themes/aura";
 import ToastService from "primevue/toastservice";
 import "primeicons/primeicons.css";
-
+import DialogService from "primevue/dialogservice";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -24,6 +24,7 @@ createInertiaApp({
 
         app.use(plugin)
             .use(ZiggyVue)
+            .use(DialogService)
             .use(PrimeVue, {
                 theme: {
                     preset: Aura,

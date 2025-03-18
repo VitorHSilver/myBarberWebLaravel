@@ -6,14 +6,16 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
+import { useAppointmentForm } from "@/composables/useAppointmentForm";
 
 const form = useForm({
     name: "",
     email: "",
+    fone: "",
     password: "",
     password_confirmation: "",
 });
-
+const { formatPhoneNumber } = useAppointmentForm();
 const passwordVisible = ref(false);
 const passwordVisibleTwo = ref(false);
 
@@ -21,6 +23,9 @@ const submit = () => {
     form.post(route("register"), {
         onFinish: () => {
             form.reset("password", "password_confirmation");
+        },
+        onError: (erro) => {
+            console.log(erro);
         },
     });
 };
@@ -74,6 +79,26 @@ const validatePasswordConfirmation = (): void => {
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="fone" value="Telefone" />
+
+                <TextInput
+                    id="fone"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.fone"
+                    @input="
+                        form.errors.fone = undefined;
+                        formatPhoneNumber();
+                    "
+                    placeholder="DD Número"
+                    required
+                    autocomplete="phone"
+                />
+
+                <InputError class="mt-2" :message="form.errors.fone" />
             </div>
 
             <div class="mt-4 relative">

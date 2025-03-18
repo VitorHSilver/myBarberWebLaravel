@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import Menubar from "primevue/menubar";
 import Button from "primevue/button";
-import { User } from "lucide-vue-next";
 import Dialog from "primevue/dialog";
+import MiniForm from "@/components/miniForm.vue";
+import Toast from "@/Layouts/Toast.vue";
 
 interface User {
     id: number;
     name: string;
     email: string;
+    fone: string;
     role: string;
     created_at?: Date;
     updated_at?: Date;
@@ -18,16 +20,12 @@ interface User {
 
 const page = usePage();
 const user = computed<User>(() => page.props.auth.user as User);
-const openModal = ref(false);
 
-const scheduleAppointment = () => {
-    openModal.value = !openModal.value;
-    console.log(user.value.name);
+const visible = ref(false);
+const setVisible = (value: boolean) => {
+    visible.value = value;
 };
 
-const form = useForm({
-    name: user.value.name || "",
-});
 const getMenuItems = () => {
     if (user.value.role === "user") {
         return [
@@ -78,7 +76,7 @@ const items = ref(getMenuItems());
 
 <template>
     <Head title="Dashboard" />
-
+    <Toast />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
@@ -122,9 +120,24 @@ const items = ref(getMenuItems());
                     severity="info"
                     size="small"
                     class="mt-4"
-                    @click="scheduleAppointment"
+                    @click="setVisible(true)"
                 />
             </div>
+
+            <div>
+                <!-- Futura seção para último agendamento -->
+            </div>
         </main>
+
+        <!-- Modal de Agendamento -->
+        <Dialog
+            v-model:visible="visible"
+            :modal="true"
+            :style="{ width: '50vw' }"
+            :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
+            @hide="setVisible(false)"
+        >
+            <MiniForm :visible="visible" :set-visible="setVisible" />
+        </Dialog>
     </AuthenticatedLayout>
 </template>

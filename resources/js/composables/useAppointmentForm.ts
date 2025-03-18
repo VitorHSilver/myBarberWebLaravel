@@ -4,7 +4,18 @@ import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import { TimelineSlots } from "primevue";
 
-export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
+export function useAppointmentForm(
+    props: {
+        timesSlot?: string[];
+        initialData?: {
+            name: string;
+            email: string;
+            fone: string;
+            date: string;
+            time: string;
+        };
+    } = {}
+) {
     const currentDate = new Date().toLocaleDateString("en-CA");
     const showTimeSelect = ref(false);
     const notificationError = ref(false);
@@ -15,11 +26,11 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
     const isDateValid = ref(true);
 
     const form = useForm({
-        name: "",
-        email: "",
-        fone: "",
-        date: currentDate,
-        time: "",
+        name: props.initialData?.name || "",
+        email: props.initialData?.email || "",
+        fone: props.initialData?.fone || "",
+        date: props.initialData?.date || currentDate,
+        time: props.initialData?.time || "",
     });
 
     const formatPhoneNumber = (): void => {
@@ -80,6 +91,7 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
         }
     };
     type TimeSlots = { times: string[] };
+    
     const fetchTimeSlots = async (date: string): Promise<TimeSlots> => {
         try {
             const response = await axios.get<TimeSlots>(
