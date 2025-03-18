@@ -28,7 +28,10 @@ class AppointmentController extends Controller
     public function userDashboard()
     {
         $user = Auth::user();
-        $appointments = Appointment::where('user_id', $user->id)->get();
+        $appointments = Appointment::where('user_id', $user->id)
+            ->orderBy('date', 'desc')
+            ->take(3)
+            ->get();
         return inertia('User/Dashboard', [
             'appointments' => $appointments,
         ]);
@@ -36,7 +39,7 @@ class AppointmentController extends Controller
 
     public function show($id)
     {
-        
+
         $appointment = Appointment::findOrFail($id);
 
         // Mantive a resposta JSON, já que parece ser um endpoint de API
@@ -77,13 +80,20 @@ class AppointmentController extends Controller
             return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
         }
     }
+    public function edit($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        return Inertia::render('Appointment', [
+            'appointment' => $appointment,
+        ]);
+    }
 
     public function update(AppointmentRequest $request, $id)
     {
         try {
             $appointment = Appointment::findOrFail($id);
 
-            
+
             if (!Gate::allows('update-own-appointment', [Auth::user(), $appointment])) {
                 abort(403, 'Acesso negado. Você não pode atualizar este agendamento.');
             }
@@ -117,7 +127,7 @@ class AppointmentController extends Controller
 
     public function destroy($id)
     {
-        
+
         $appointment = Appointment::findOrFail($id);
 
         // Adicionei verificação de permissão (apenas admins podem deletar)

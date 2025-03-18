@@ -104,12 +104,18 @@ export function useAppointmentForm(
             return { times: [] };
         }
     };
-    const checkDate = async (value: any) => {
+    const checkDate = async (value: string | Date) => {
         const selectedDate =
-            value instanceof Date ? value.toISOString().split("T")[0] : value;
+            form.date instanceof Date
+                ? form.date.toISOString().split("T")[0]
+                : typeof form.date === "string"
+                ? form.date
+                : "";
 
-        console.log("Data selecionada no checkDate:", selectedDate);
-
+        if (!selectedDate) {
+            console.error("Data não fornecida ou inválida:", form.date);
+            return;
+        }
         const currentDate = new Date().toISOString().split("T")[0];
 
         if (selectedDate < currentDate) {
@@ -123,7 +129,6 @@ export function useAppointmentForm(
             isDateValid.value = false;
         } else {
             const isValidBusinessDay = await isBusinessDay(selectedDate);
-
             if (!isValidBusinessDay) {
                 toast.add({
                     severity: "error",
@@ -135,7 +140,6 @@ export function useAppointmentForm(
                 isDateValid.value = false;
             } else {
                 await fetchTimeSlots(selectedDate);
-                console.log("Horários disponíveis:", timesSlot.value);
                 showTimeSelect.value = true;
                 isDateValid.value = true;
             }

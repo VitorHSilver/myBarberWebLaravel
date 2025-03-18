@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import Menubar from "primevue/menubar";
 import { computed, ref } from "vue";
+import { Link } from "@inertiajs/vue3";
 
 interface User {
     id: number;
@@ -91,7 +92,7 @@ const items = ref(getMenuItems());
         </template>
         <Menubar :model="items" class="lg:justify-center">
             <template #item="{ item, props }">
-                <router-link
+                <Link
                     v-if="item.route"
                     v-slot="{ href, navigate }"
                     :to="item.route"
@@ -106,7 +107,7 @@ const items = ref(getMenuItems());
                         <span :class="item.icon" />
                         <span class="ml-2">{{ item.label }}</span>
                     </a>
-                </router-link>
+                </Link>
                 <a
                     v-else
                     v-ripple

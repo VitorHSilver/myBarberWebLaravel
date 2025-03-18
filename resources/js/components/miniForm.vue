@@ -2,9 +2,9 @@
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
-import { Button, Select, useToast } from "primevue";
+import { Button, useToast } from "primevue";
 import DatePicker from "primevue/datepicker";
-import { event } from "@primeuix/themes/aura/timeline";
+
 interface User {
     id: number;
     name: string;
@@ -66,17 +66,21 @@ const submitForm = (setVisible: (value: boolean) => void) => {
 
     // Validação básica no frontend
     if (!form.date) {
-        console.error("Por favor, selecione uma data.");
         return;
     }
     if (!form.time && showTimeSelect.value) {
-        console.error("Por favor, selecione um horário.");
+        toast.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Por favor, selecione um horário",
+            life: 3000,
+        });
         return;
     }
 
     form.post("/appointments", {
         onSuccess: () => {
-            setVisible(false); // Fecha o modal após sucesso
+            setVisible(false);
             toast.add({
                 severity: "success",
                 summary: "Consulta marcada!",
@@ -88,7 +92,7 @@ const submitForm = (setVisible: (value: boolean) => void) => {
             toast.add({
                 severity: "error",
                 summary: "Erro",
-                detail: `${errors.date} `,
+                detail:  "Selecione uma data",
                 life: 3000,
             });
             console.log(errors);

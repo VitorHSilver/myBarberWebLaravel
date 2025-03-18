@@ -8,5 +8,4 @@ Route::get('/all', [AppointmentController::class, 'getAllAppointment'])->name('f
 
 Route::get('/available-times', [AppointmentController::class, 'getAvailableTimes'])->name('available.times');
 
-// Rota para buscar reservas do dia (pode ser mantida como API ou passada via props)
 Route::get('/reservations', [AppointmentController::class, 'getReservationsOfDay'])->name('reservations');
