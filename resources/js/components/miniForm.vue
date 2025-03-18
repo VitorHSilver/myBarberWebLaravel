@@ -4,6 +4,7 @@ import { usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 import { Button, Select, useToast } from "primevue";
 import DatePicker from "primevue/datepicker";
+import { event } from "@primeuix/themes/aura/timeline";
 interface User {
     id: number;
     name: string;
@@ -108,31 +109,27 @@ const submitForm = (setVisible: (value: boolean) => void) => {
                 inline
                 showWeek
                 class="w-full sm:w-[30rem]"
+                @update:model-value="checkDate"
             />
-            <Select
-                v-model="form.time"
-                :options="timesSlot"
-                optionLabel="time"
-                placeholder="Selecione seu Horario"
-                checkmark
-                :highlightOnSelect="false"
-                class="w-full md:w-[30rem]"
-            />
-        </div>
-        <div v-show="showTimeSelect" class="mt-4">
-            <select
-                class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
-                v-model="form.time"
-                aria-label="Horario"
-            >
-                <option disabled value="">Horarios</option>
-                <option v-if="timesSlot.length === 0" disabled>
-                    Nenhum horário disponível
-                </option>
-                <option v-for="times in timesSlot" :key="times" :value="times">
-                    {{ times }}
-                </option>
-            </select>
+            <div v-show="showTimeSelect" class="mt-2 sm:w-[30rem]">
+                <select
+                    class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
+                    v-model="form.time"
+                    aria-label="Horario"
+                >
+                    <option disabled value="">Horarios</option>
+                    <option v-if="timesSlot.length === 0" disabled>
+                        Nenhum horário disponível
+                    </option>
+                    <option
+                        v-for="times in timesSlot"
+                        :key="times"
+                        :value="times"
+                    >
+                        {{ times }}
+                    </option>
+                </select>
+            </div>
         </div>
         <div class="flex gap-x-4 justify-end mt-2">
             <Button

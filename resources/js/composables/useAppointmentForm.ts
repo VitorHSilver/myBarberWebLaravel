@@ -91,12 +91,11 @@ export function useAppointmentForm(
         }
     };
     type TimeSlots = { times: string[] };
-    
+
     const fetchTimeSlots = async (date: string): Promise<TimeSlots> => {
         try {
-            const response = await axios.get<TimeSlots>(
-                `api/available-times?date=${date}`
-            );
+            const url = `/api/available-times?date=${encodeURIComponent(date)}`; // URL absoluta
+            const response = await axios.get<TimeSlots>(url);
             timesSlot.value = response.data.times;
             return response.data;
         } catch (error) {
@@ -105,13 +104,15 @@ export function useAppointmentForm(
             return { times: [] };
         }
     };
-    const checkDate = async (event: Event) => {
-        const target = event.target as HTMLInputElement;
-        form.date = target.value;
+    const checkDate = async (value: any) => {
+        const selectedDate =
+            value instanceof Date ? value.toISOString().split("T")[0] : value;
+
+        console.log("Data selecionada no checkDate:", selectedDate);
 
         const currentDate = new Date().toISOString().split("T")[0];
 
-        if (target.value < currentDate) {
+        if (selectedDate < currentDate) {
             toast.add({
                 severity: "error",
                 summary: "Erro",
@@ -121,7 +122,8 @@ export function useAppointmentForm(
             showTimeSelect.value = false;
             isDateValid.value = false;
         } else {
-            const isValidBusinessDay = await isBusinessDay(target.value);
+            const isValidBusinessDay = await isBusinessDay(selectedDate);
+
             if (!isValidBusinessDay) {
                 toast.add({
                     severity: "error",
@@ -132,7 +134,8 @@ export function useAppointmentForm(
                 showTimeSelect.value = false;
                 isDateValid.value = false;
             } else {
-                await fetchTimeSlots(target.value);
+                await fetchTimeSlots(selectedDate);
+                console.log("Horários disponíveis:", timesSlot.value);
                 showTimeSelect.value = true;
                 isDateValid.value = true;
             }
