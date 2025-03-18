@@ -9,8 +9,8 @@ const {
     form,
     showTimeSelect,
     notificationError,
-    formatPhoneNumber,
-    checkDate,
+    formatPhone,
+    validateAndFetchTimeSlots,
     cleanField,
     dateInput,
     timesSlot,
@@ -93,7 +93,7 @@ const handleSubmit = async () => {
                     aria-label="Fone"
                     @input="
                         form.errors.fone = undefined;
-                        formatPhoneNumber();
+                        formatPhone();
                     "
                 />
                 <InputError :message="form.errors.fone" />
@@ -104,8 +104,8 @@ const handleSubmit = async () => {
                     type="date"
                     class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
                     v-model="form.date"
-                    @change="checkDate"
-                    @focus="checkDate"
+                    @change="validateAndFetchTimeSlots(form.date)"
+                    @focus="validateAndFetchTimeSlots(form.date)"
                     ref="dateInput"
                 />
                 <div v-show="showTimeSelect" class="block flex-grow">

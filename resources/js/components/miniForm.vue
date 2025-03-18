@@ -33,20 +33,16 @@ const page = usePage();
 const user = computed(() => page.props.auth.user as User);
 const currentDate = new Date().toLocaleDateString("en-CA");
 
-const {
-    form,
-    showTimeSelect,
-    checkDate,
-    timesSlot,
-} = useAppointmentForm({
-    initialData: {
-        name: user.value.name || "",
-        email: user.value.email || "",
-        fone: user.value.fone || "",
-        date: currentDate,
-        time: "",
-    } as Form,
-});
+const { form, showTimeSelect, validateAndFetchTimeSlots, timesSlot } =
+    useAppointmentForm({
+        initialData: {
+            name: user.value.name || "",
+            email: user.value.email || "",
+            fone: user.value.fone || "",
+            date: currentDate,
+            time: "",
+        } as Form,
+    });
 
 // Função para enviar o formulário
 const submitForm = (setVisible: (value: boolean) => void) => {
@@ -110,7 +106,8 @@ const submitForm = (setVisible: (value: boolean) => void) => {
                 inline
                 showWeek
                 class="w-full sm:w-[30rem]"
-                @update:model-value="checkDate"
+                @update:model-value="validateAndFetchTimeSlots(form.date)"
+                dateFormat="yy-mm-dd"
             />
             <div v-show="showTimeSelect" class="mt-2 sm:w-[30rem]">
                 <select
