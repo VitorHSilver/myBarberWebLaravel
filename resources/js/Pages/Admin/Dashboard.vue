@@ -94,23 +94,14 @@ const items = ref(getMenuItems());
             <template #item="{ item, props }">
                 <Link
                     v-if="item.route"
-                    v-slot="{ href, navigate }"
-                    :to="item.route"
-                    custom
+                    :href="item.route"
+                    v-bind="props.action"
                 >
-                    <a
-                        v-ripple
-                        :href="href"
-                        v-bind="props.action"
-                        @click="navigate"
-                    >
-                        <span :class="item.icon" />
-                        <span class="ml-2">{{ item.label }}</span>
-                    </a>
+                    <span :class="item.icon" />
+                    <span class="ml-2">{{ item.label }}</span>
                 </Link>
                 <a
                     v-else
-                    v-ripple
                     :href="item.url"
                     :target="item.target"
                     v-bind="props.action"

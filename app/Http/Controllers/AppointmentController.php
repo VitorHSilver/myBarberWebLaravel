@@ -37,20 +37,27 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show()
     {
+        $user = Auth::user();
+        $appointments = Appointment::where('user_id', $user->id)
+            ->where('date', '>=', now()->toDateString())
+            ->orderBy('date', 'desc')
+            ->take(3)
+            ->get();
 
-        $appointment = Appointment::findOrFail($id);
-
-        // Mantive a resposta JSON, já que parece ser um endpoint de API
-        return response()->json($appointment, 200);
-
-        // Se preferir usar Inertia, descomente esta parte:
-        // return Inertia::render('AppointmentShow', [
-        //     'appointment' => $appointment,
-        // ]);
+        return Inertia::render('User/Appointment', [
+            'appointments' => $appointments,
+        ]);
     }
 
+    public function edit($id)
+    {
+        $appointment = Appointment::find($id);
+        return Inertia::render('User/Appointment', [
+            'appointment' => $appointment,
+        ]);
+    }
     public function store(AppointmentRequest $request)
     {
         try {
@@ -79,13 +86,6 @@ class AppointmentController extends Controller
             Log::error('Erro ao criar agendamento: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
             return redirect()->back()->with('error', 'Erro ao criar agendamento: ' . $e->getMessage());
         }
-    }
-    public function edit($id)
-    {
-        $appointment = Appointment::findOrFail($id);
-        return Inertia::render('Appointment', [
-            'appointment' => $appointment,
-        ]);
     }
 
     public function update(AppointmentRequest $request, $id)

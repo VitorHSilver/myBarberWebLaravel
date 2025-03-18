@@ -2,11 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router, usePage } from "@inertiajs/vue3";
 import Menubar from "primevue/menubar";
-import Dialog from "primevue/dialog";
 import { computed, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 import { Button } from "primevue";
-import MiniForm from "@/components/miniForm.vue";
 
 interface User {
     id: number;
@@ -25,7 +23,7 @@ interface Appointment {
 const page = usePage();
 const user = computed<User>(() => page.props.auth.user as User);
 const appointments = computed<Appointment[]>(
-    () => (page.props.appointments as Appointment[]) || []
+    () => (page.props.appointment as Appointment[]) || []
 );
 
 const getMenuItems = () => {
@@ -84,22 +82,9 @@ const formatDatePtBr = (dateString: string) => {
     const year = date.getUTCFullYear();
     return `${day}/${month}/${year}`;
 };
-const selectedAppointment = ref<Appointment | null>(null);
-
 const getDateByID = (id: number) => {
-    const appointment = appointments.value.find((app) => app.id === id);
-    if (appointment) {
-        selectedAppointment.value = appointment;
-    } else {
-        console.error("Consulta não encontrada para o ID:", id);
-    }
+    console.log(id);
 };
-
-//modal
-const setVisible = (value: boolean) => {
-    visible.value = value;
-};
-const visible = ref(false);
 </script>
 
 <template>
@@ -133,30 +118,18 @@ const visible = ref(false);
             </template>
         </Menubar>
         <main class="grid grid-cols-3 justify-items-center">
-            <ul v-for="appointment in appointments" :key="appointment.id">
+            <ul
+                class=""
+                v-for="appointment in appointments"
+                :key="appointment.id"
+            >
                 <Button
                     :label="formatDatePtBr(appointment.date)"
                     severity="info"
                     size="large"
                     class="mt-4"
-                    @click="
-                        getDateByID(appointment.id);
-                        setVisible(true);
-                    "
+                    @click="getDateByID(appointment.id)"
                 />
-                <Dialog
-                    v-model:visible="visible"
-                    :modal="true"
-                    :style="{ width: '50vw' }"
-                    :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
-                    @hide="setVisible(false)"
-                >
-                    <MiniForm
-                        :visible="visible"
-                        :set-visible="setVisible"
-                        :appointment="selectedAppointment"
-                    />
-                </Dialog>
             </ul>
         </main>
     </AuthenticatedLayout>

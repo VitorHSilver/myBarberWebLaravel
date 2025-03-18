@@ -27,6 +27,7 @@ defineProps<{
     visible: boolean;
     setVisible: (value: boolean) => void;
 }>();
+
 const toast = useToast();
 const page = usePage();
 const user = computed(() => page.props.auth.user as User);
@@ -35,11 +36,7 @@ const currentDate = new Date().toLocaleDateString("en-CA");
 const {
     form,
     showTimeSelect,
-    notificationError,
-    formatPhoneNumber,
     checkDate,
-    cleanField,
-    dateInput,
     timesSlot,
 } = useAppointmentForm({
     initialData: {
@@ -92,7 +89,7 @@ const submitForm = (setVisible: (value: boolean) => void) => {
             toast.add({
                 severity: "error",
                 summary: "Erro",
-                detail:  "Selecione uma data",
+                detail: "Selecione uma data",
                 life: 3000,
             });
             console.log(errors);

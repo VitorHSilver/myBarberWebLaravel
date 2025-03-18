@@ -7,6 +7,8 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import MiniForm from "@/components/miniForm.vue";
 import Toast from "@/Layouts/Toast.vue";
+import { Link } from "@inertiajs/vue3";
+// import { route } from '@inertiajs/vue3';
 
 interface User {
     id: number;
@@ -17,9 +19,22 @@ interface User {
     created_at?: Date;
     updated_at?: Date;
 }
+interface Appointment {
+    id: number;
+    user_id: number;
+    date: string;
+    time: string;
+    created_at?: Date;
+    updated_at?: Date;
+}
 
 const page = usePage();
 const user = computed<User>(() => page.props.auth.user as User);
+const appointments = computed<Appointment[]>(
+    () => page.props.appointments as Appointment[]
+);
+const appointment_id = appointments.value.map((item) => item.id);
+console.log(appointment_id); // array de consultas
 
 const visible = ref(false);
 const setVisible = (value: boolean) => {
@@ -39,10 +54,12 @@ const getMenuItems = () => {
                     {
                         label: "Alterar Datas",
                         icon: "pi pi-calendar-plus",
+                        route: route("appointments.show"), 
                     },
                     {
                         label: "Cancelar Consulta",
                         icon: "pi pi-calendar-minus",
+                        route: route("appointments.show"), 
                     },
                 ],
             },
@@ -53,6 +70,7 @@ const getMenuItems = () => {
                     {
                         label: "Consultas",
                         icon: "pi pi-user-plus",
+                        // route: route("appointments.list"), // Ajuste a rota conforme necessário
                     },
                 ],
             },
@@ -72,6 +90,13 @@ const getMenuItems = () => {
 };
 
 const items = ref(getMenuItems());
+const formatDatePtBr = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // getUTCMonth() é 0-based
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
+};
 </script>
 
 <template>
@@ -85,25 +110,16 @@ const items = ref(getMenuItems());
         </template>
         <Menubar :model="items" class="lg:justify-center">
             <template #item="{ item, props }">
-                <router-link
+                <Link
                     v-if="item.route"
-                    v-slot="{ href, navigate }"
-                    :to="item.route"
-                    custom
+                    :href="item.route"
+                    v-bind="props.action"
                 >
-                    <a
-                        v-ripple
-                        :href="href"
-                        v-bind="props.action"
-                        @click="navigate"
-                    >
-                        <span :class="item.icon" />
-                        <span class="ml-2">{{ item.label }}</span>
-                    </a>
-                </router-link>
+                    <span :class="item.icon" />
+                    <span class="ml-2">{{ item.label }}</span>
+                </Link>
                 <a
                     v-else
-                    v-ripple
                     :href="item.url"
                     :target="item.target"
                     v-bind="props.action"
@@ -118,26 +134,35 @@ const items = ref(getMenuItems());
                 <Button
                     label="Agendar Corte"
                     severity="info"
-                    size="small"
+                    size="large"
                     class="mt-4"
                     @click="setVisible(true)"
                 />
             </div>
-
-            <div>
-                <!-- Futura seção para último agendamento -->
-            </div>
+            <Dialog
+                v-model:visible="visible"
+                :modal="true"
+                :style="{ width: '50vw' }"
+                :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
+                @hide="setVisible(false)"
+            >
+                <MiniForm :visible="visible" :set-visible="setVisible" />
+            </Dialog>
         </main>
+        <div class="flex justify-center text-5xl">
+            <ul class="mt-4">
+                <h2 class="text-center mb-4">Últimos Horarios:</h2>
+                <li
+                    class="mb-2"
+                    v-for="appointment in appointments"
+                    :key="appointment.id"
+                >
+                    {{ formatDatePtBr(appointment.date) }} -
+                    {{ appointment.time.slice(0, 5) }}
+                </li>
+            </ul>
+        </div>
 
         <!-- Modal de Agendamento -->
-        <Dialog
-            v-model:visible="visible"
-            :modal="true"
-            :style="{ width: '50vw' }"
-            :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
-            @hide="setVisible(false)"
-        >
-            <MiniForm :visible="visible" :set-visible="setVisible" />
-        </Dialog>
     </AuthenticatedLayout>
 </template>
