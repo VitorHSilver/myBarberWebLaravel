@@ -7,7 +7,6 @@ import { defineAsyncComponent, onMounted, ref } from "vue";
 import { LoadingStatus } from "@/lib/utils";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-
 const AppointmentFormAsync = defineAsyncComponent(
     () => import("@/components/AppointmentForm.vue")
 );
@@ -31,7 +30,7 @@ onMounted(() => {
         if (isBackgroundLoaded.value) {
             loadingStatus.finishLoading();
         }
-    }, 2000); 
+    }, 2000);
 });
 </script>
 
@@ -41,7 +40,6 @@ onMounted(() => {
     <Toast />
     <main class="conteudo container" id="home">
         <Suspense>
-         
             <div
                 class="relative max-2xl:pt-32 px-8 pb-16 overflow-hidden text-white bg-gradient-to-t from-marrom-950/40 max-smallscreen:bg-gradient-to-tr max-smallscreen:from-transparent rounded-lg"
             >
@@ -67,7 +65,6 @@ onMounted(() => {
                     @load="onBackgroundLoaded"
                 />
 
-                
                 <AppointmentFormAsync />
 
                 <div
@@ -82,7 +79,6 @@ onMounted(() => {
                 </div>
             </div>
 
-            
             <template #fallback>
                 <LoadingSpinner />
             </template>

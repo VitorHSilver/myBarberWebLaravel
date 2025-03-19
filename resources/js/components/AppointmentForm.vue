@@ -35,6 +35,7 @@ const handleSubmit = async () => {
                 detail: "Para alterar a data do agendamento, por favor, crie uma conta.",
                 life: 5000,
             });
+            
         },
         onError: () => {
             toast.add({

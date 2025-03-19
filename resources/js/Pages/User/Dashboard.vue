@@ -8,7 +8,6 @@ import Dialog from "primevue/dialog";
 import MiniForm from "@/components/miniForm.vue";
 import Toast from "@/Layouts/Toast.vue";
 import { Link } from "@inertiajs/vue3";
-// import { route } from '@inertiajs/vue3';
 
 interface User {
     id: number;
@@ -34,7 +33,6 @@ const appointments = computed<Appointment[]>(
     () => page.props.appointments as Appointment[]
 );
 const appointment_id = appointments.value.map((item) => item.id);
-console.log(appointment_id); // array de consultas
 
 const visible = ref(false);
 const setVisible = (value: boolean) => {
@@ -54,12 +52,12 @@ const getMenuItems = () => {
                     {
                         label: "Alterar Datas",
                         icon: "pi pi-calendar-plus",
-                        route: route("appointments.show"), 
+                        route: route("appointments.show"),
                     },
                     {
                         label: "Cancelar Consulta",
                         icon: "pi pi-calendar-minus",
-                        route: route("appointments.show"), 
+                        route: route("appointments.show"),
                     },
                 ],
             },

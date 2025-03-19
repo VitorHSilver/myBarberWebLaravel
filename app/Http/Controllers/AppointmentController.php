@@ -29,7 +29,8 @@ class AppointmentController extends Controller
     {
         $user = Auth::user();
         $appointments = Appointment::where('user_id', $user->id)
-            ->orderBy('date', 'desc')
+            ->where('date', '>=', now()->toDateString())
+            ->orderBy('date', 'asc')
             ->take(3)
             ->get();
         return inertia('User/Dashboard', [
@@ -51,13 +52,6 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function edit($id)
-    {
-        $appointment = Appointment::find($id);
-        return Inertia::render('User/Appointment', [
-            'appointment' => $appointment,
-        ]);
-    }
     public function store(AppointmentRequest $request)
     {
         try {
@@ -93,8 +87,7 @@ class AppointmentController extends Controller
         try {
             $appointment = Appointment::findOrFail($id);
 
-
-            if (!Gate::allows('update-own-appointment', [Auth::user(), $appointment])) {
+            if (!Gate::allows('update-own-appointment', $appointment)) {
                 abort(403, 'Acesso negado. Você não pode atualizar este agendamento.');
             }
 
@@ -114,7 +107,7 @@ class AppointmentController extends Controller
                 'user_id' => $userId ?? $appointment->user_id,
             ]);
 
-            return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
+            return redirect()->route('user.dashboard')->with('success', 'Consulta atualizada com sucesso!');
         } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator->errors())
@@ -174,6 +167,15 @@ class AppointmentController extends Controller
         try {
             $appointments = Appointment::getAllAppointments();
             return response()->json($appointments, 200);
+        } catch (\Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
+        }
+    }
+    public function getByID($id)
+    {
+        try {
+            $appointment = Appointment::getById($id);
+            return response()->json($appointment, 200);
         } catch (\Exception $e) {
             return response()->json(["message" => $e->getMessage()], 500);
         }

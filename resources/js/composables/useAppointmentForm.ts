@@ -45,36 +45,35 @@ export function useAppointmentForm(
         isDateValid.value = true;
     };
 
-   const validateAndFetchTimeSlots = async (date: string | Date) => {
-    let dateString: string;
-
-    // Garante que a data seja uma string no formato "YYYY-MM-DD"
-    if (date instanceof Date) {
-        dateString = date.toISOString().split("T")[0];
-    } else if (typeof date === "string") {
-        dateString = date;
-    } else {
-        console.error("Formato de data inválido:", date);
-        return;
-    }
-    try {
-        const isValid = await checkDate(dateString, toast);
-
-        if (isValid) {
-            const slots = await fetchTimeSlots(dateString);
-            timesSlot.value = slots;
-            showTimeSelect.value = true;
+    const validateAndFetchTimeSlots = async (date: string | Date) => {
+        let dateString: string;
+        if (date instanceof Date) {
+            dateString = date.toISOString().split("T")[0];
+        } else if (typeof date === "string") {
+            dateString = date;
         } else {
-            console.log("Data inválida, horários não serão carregados.");
+            console.error("Formato de data inválido:", date);
+            return;
+        }
+        form.date = dateString;
+        try {
+            const isValid = await checkDate(dateString, toast);
+         
+            if (isValid) {
+                const slots = await fetchTimeSlots(dateString);
+                timesSlot.value = slots;
+                showTimeSelect.value = true;
+            } else {
+                console.log("Data inválida, horários não serão carregados.");
+                showTimeSelect.value = false;
+                timesSlot.value = [];
+            }
+        } catch (error) {
+            console.error("Erro ao validar ou buscar horários:", error);
             showTimeSelect.value = false;
             timesSlot.value = [];
         }
-    } catch (error) {
-        console.error("Erro ao validar ou buscar horários:", error);
-        showTimeSelect.value = false;
-        timesSlot.value = [];
-    }
-};
+    };
 
     onMounted(() => {
         if (window.innerWidth < 768) {

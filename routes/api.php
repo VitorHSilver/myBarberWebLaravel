@@ -9,3 +9,5 @@ Route::get('/all', [AppointmentController::class, 'getAllAppointment'])->name('f
 Route::get('/available-times', [AppointmentController::class, 'getAvailableTimes'])->name('available.times');
 
 Route::get('/reservations', [AppointmentController::class, 'getReservationsOfDay'])->name('reservations');
+
+Route::get('/{id}', [AppointmentController::class, 'getById'])->name('getByid');
