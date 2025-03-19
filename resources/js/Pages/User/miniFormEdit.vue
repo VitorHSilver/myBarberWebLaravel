@@ -4,15 +4,7 @@ import { useForm } from "@inertiajs/vue3";
 import { onMounted } from "vue";
 import { Button, useToast } from "primevue";
 import DatePicker from "primevue/datepicker";
-
-interface Appointment {
-    id: number;
-    date: string;
-    time: string;
-    name: string;
-    email: string;
-    fone: string;
-}
+import { Appointment } from "@/types/appointment";
 
 const props = defineProps<{
     appointment: Appointment;
@@ -22,7 +14,13 @@ const props = defineProps<{
 
 const toast = useToast();
 
-const form = useForm({
+const form = useForm<{
+    date: string | Date;
+    time: string;
+    name: string;
+    email: string;
+    fone: string;
+}>({
     date: new Date(props.appointment.date),
     time: props.appointment.time,
     name: props.appointment.name,
@@ -45,45 +43,35 @@ onMounted(() => {
     validateAndFetchTimeSlots(props.appointment.date);
 });
 
-// Função para enviar o formulário
 const submitForm = () => {
+    // Formata a data para YYYY-MM-DD
     let dateString = "";
     if (form.date instanceof Date) {
-        dateString = form.date.toISOString().split("T")[0];
+        const year = form.date.getFullYear();
+        const month = String(form.date.getMonth() + 1).padStart(2, "0");
+        const day = String(form.date.getDate()).padStart(2, "0");
+        dateString = `${year}-${month}-${day}`;
     } else if (typeof form.date === "string") {
-        dateString = form.date;
+        dateString = form.date.split("T")[0];
     } else {
-        console.error("form.date não é um formato válido:", form.date);
+        console.error("Formato inválido para form.date:", form.date);
+        toast.add({
+            severity: "error",
+            summary: "Erro",
+            detail: "Formato de data inválido.",
+            life: 3000,
+        });
         return;
     }
 
-    if (!form.date) {
-        console.log("Erro: Data não selecionada"); // Adicione este log
-        toast.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Por favor, selecione uma data",
-            life: 3000,
-        });
-        return;
-    }
-    if (!form.time && showTimeSelect.value) {
-        console.log("Erro: Horário não selecionado"); // Adicione este log
-        toast.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Por favor, selecione um horário",
-            life: 3000,
-        });
-        return;
-    }
+    form.date = dateString;
 
     form.put(route("appointments.update", props.appointment.id), {
         onSuccess: () => {
             toast.add({
                 severity: "success",
-                summary: "Consulta marcada!",
-                detail: "Para alterar a data do agendamento, por favor, crie uma conta.",
+                summary: "Alteração de data!",
+                detail: "Alteramento feito com sucesso",
                 life: 5000,
             });
         },
@@ -91,7 +79,7 @@ const submitForm = () => {
             toast.add({
                 severity: "error",
                 summary: "Erro",
-                detail: "Selecione um data",
+                detail: "Selecione um Horario",
                 life: 3000,
             });
             console.log(errors);
@@ -105,7 +93,6 @@ const formatDatePtBr = (dateString: string) => {
     const year = date.getFullYear(); // Usa getFullYear() para o ano local
     return `${day}/${month}/${year}`;
 };
-
 </script>
 
 <template>
@@ -119,7 +106,6 @@ const formatDatePtBr = (dateString: string) => {
                 class="w-full sm:w-[30rem]"
                 @update:model-value="validateAndFetchTimeSlots(form.date)"
                 dateFormat="yy-mm-dd"
-    
             />
             <div v-show="showTimeSelect" class="mt-2 sm:w-[30rem]">
                 <label>Horarios</label>
@@ -153,7 +139,7 @@ const formatDatePtBr = (dateString: string) => {
         <div class="flex gap-x-4 justify-end mt-2">
             <Button
                 type="button"
-                label="Cancel"
+                label="Voltar"
                 severity="contrast"
                 @click="setVisible(false)"
             />
@@ -161,7 +147,7 @@ const formatDatePtBr = (dateString: string) => {
                 type="submit"
                 severity="success"
                 size="small"
-                label="Salvar"
+                label="Atualizar"
             />
         </div>
     </form>

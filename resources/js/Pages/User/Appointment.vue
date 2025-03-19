@@ -8,28 +8,20 @@ import { Link } from "@inertiajs/vue3";
 import { Button } from "primevue";
 import MiniFormEdit from "./miniFormEdit.vue";
 import Toast from "@/Layouts/Toast.vue";
-
+import { Appointment } from "@/types/appointment";
 interface User {
     id: number;
     name: string;
     email: string;
     role: string;
 }
-interface Appointment {
-    id: number;
-    user_id: number;
-    date: string;
-    time: string;
-    created_at?: Date;
-    updated_at?: Date;
-}
+
 const page = usePage();
 const user = computed<User>(() => page.props.auth.user as User);
 
 const appointments = computed<Appointment[]>(
     () => (page.props.appointments as Appointment[]) || []
 );
-
 
 const getMenuItems = () => {
     if (user.value.role === "user") {
@@ -147,6 +139,7 @@ const visible = ref(false);
                 @hide="setVisible(false)"
             >
                 <MiniFormEdit
+                    v-if="selectedAppointment"
                     :visible="visible"
                     :set-visible="setVisible"
                     :appointment="selectedAppointment"
