@@ -107,7 +107,7 @@ class AppointmentController extends Controller
                 'user_id' => $userId ?? $appointment->user_id,
             ]);
 
-            return redirect()->route('user.dashboard')->with('success', 'Consulta atualizada com sucesso!');
+            return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
         } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator->errors())

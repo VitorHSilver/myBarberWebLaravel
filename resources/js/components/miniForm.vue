@@ -26,35 +26,35 @@ const toast = useToast();
 const page = usePage();
 const user = computed<User>(() => page.props.auth.user as User);
 
-
-// Formulário do Inertia.js para envio
-const form = useForm<{
-    date: Date; 
+interface Form {
+    date: Date;
     time: string;
     name: string;
     email: string;
     fone: string;
-}>({
-    date: props.appointment ? new Date(props.appointment.date) : new Date(), // Converte para Date
+    [key: string]: any;
+}
+
+const form = useForm<Form>({
+    date: props.appointment ? new Date(props.appointment.date) : new Date(),
     time: props.appointment?.time || "",
     name: props.appointment?.name || user.value.name || "",
     email: props.appointment?.email || user.value.email || "",
     fone: props.appointment?.fone || user.value.fone || "",
 });
 
-// Composable para gerenciar horários
+
 const { showTimeSelect, validateAndFetchTimeSlots, timesSlot } =
     useAppointmentForm({
         initialData: {
             name: form.name,
             email: form.email,
             fone: form.fone,
-            date: form.date.toISOString().split("T")[0], // Converte para string para o composable
+            date: form.date.toISOString().split("T")[0], 
             time: form.time,
         },
     });
 
-// Atualiza os horários disponíveis quando a data muda
 const onDateUpdate = (
     value: Date | Date[] | (Date | null)[] | null | undefined
 ) => {
@@ -67,15 +67,9 @@ const onDateUpdate = (
 };
 
 const submitForm = () => {
-    // Converte form.date para string no formato YYYY-MM-DD
     const dateString = form.date.toISOString().split("T")[0];
 
-    // Atualiza os dados do form
-    form.date = dateString as any; // Temporariamente usamos 'as any' para evitar conflito de tipo
-    form.time = form.time;
-    form.name = form.name;
-    form.email = form.email;
-    form.fone = form.fone;
+    form.date = dateString as any;
 
     form.post(route("appointments.store"), {
         onSuccess: () => {
@@ -85,7 +79,7 @@ const submitForm = () => {
                 detail: "Agendamento criado com sucesso!",
                 life: 5000,
             });
-            props.setVisible(false); // Fecha o modal
+            props.setVisible(false);
         },
         onError: (errors: any) => {
             toast.add({

@@ -32,7 +32,7 @@ const user = computed<User>(() => page.props.auth.user as User);
 const appointments = computed<Appointment[]>(
     () => page.props.appointments as Appointment[]
 );
-const appointment_id = appointments.value.map((item) => item.id);
+
 
 const visible = ref(false);
 const setVisible = (value: boolean) => {

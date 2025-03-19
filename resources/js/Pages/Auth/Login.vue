@@ -52,7 +52,7 @@ onMounted(() => {
         </div>
         <form @submit.prevent="submit">
             <div>
-                <FloatLabel variant="on">
+                <FloatLabel variant="over">
                     <InputText
                         id="email"
                         type="email"
@@ -67,8 +67,8 @@ onMounted(() => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4 relative">
-                <FloatLabel variant="on">
+            <div class="mt-8 relative">
+                <FloatLabel variant="over">
                     <InputText
                         id="password"
                         :type="passwordVisible ? 'text' : 'password'"
@@ -155,12 +155,24 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Estilo para o InputText em foco */
+:deep(.p-inputtext) {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ccc !important;
+}
+
 :deep(.p-inputtext:focus) {
     border-color: #9f9f9f !important;
     box-shadow: none !important;
 }
+
 label {
     color: #9f9f9f !important;
+}
+
+input:focus {
+    border-color: gray;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 </style>

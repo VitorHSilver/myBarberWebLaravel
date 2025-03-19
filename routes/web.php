@@ -11,7 +11,6 @@ Route::get('/', [AppointmentController::class, 'index'])->name('home');
 Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/appointments', [AppointmentController::class, 'show'])->name('appointments.show');
 Route::get('/appointment/{id}', [AppointmentController::class, 'edit'])->name('appointment.edit');
-// Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
 Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
 // Redireciona para a dashboard correta com base no role

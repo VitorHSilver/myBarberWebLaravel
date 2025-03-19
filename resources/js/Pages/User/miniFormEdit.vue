@@ -14,13 +14,16 @@ const props = defineProps<{
 
 const toast = useToast();
 
-const form = useForm<{
+interface Form {
     date: Date;
     time: string;
     name: string;
     email: string;
     fone: string;
-}>({
+    [key: string]: any;
+}
+
+const form = useForm<Form>({
     date: new Date(props.appointment.date),
     time: props.appointment.time,
     name: props.appointment.name,
@@ -46,8 +49,7 @@ onMounted(() => {
 const submitForm = () => {
     const dateString = form.date.toISOString().split("T")[0];
 
-    // Atualiza o form.date para ser uma string
-    form.date = dateString as any; // Temporariamente usamos 'as any' para evitar conflito de tipo
+    form.date = dateString as any;
 
     form.put(route("appointments.update", props.appointment.id), {
         onSuccess: () => {
@@ -57,6 +59,7 @@ const submitForm = () => {
                 detail: "Alteramento feito com sucesso",
                 life: 5000,
             });
+            props.setVisible(false);
         },
         onError: (errors: any) => {
             toast.add({
