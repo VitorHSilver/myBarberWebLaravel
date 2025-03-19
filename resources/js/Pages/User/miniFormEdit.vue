@@ -122,7 +122,7 @@ const formatDatePtBr = (dateString: string) => {
     
             />
             <div v-show="showTimeSelect" class="mt-2 sm:w-[30rem]">
-                <label for>Horarios</label>
+                <label>Horarios</label>
                 <select
                     class="max-md:w-full px-1 py-1 bg-transparent border-2 border-gray-100/60 rounded-md *:text-black w-full"
                     v-model="form.time"
@@ -144,7 +144,7 @@ const formatDatePtBr = (dateString: string) => {
             <p
                 class="font-bold flex justify-between items-center max-md:flex-col"
             >
-                Sua nova será:
+                Sua nova data será:
                 <span class="text-2xl text-emerald-600">
                     {{ formatDatePtBr(form.date) }} - {{ form.time }}</span
                 >

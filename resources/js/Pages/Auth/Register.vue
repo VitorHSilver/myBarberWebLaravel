@@ -6,7 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { useAppointmentForm } from "@/composables/useAppointmentForm";
+import { formatPhoneNumber } from "@/utils/phoneUtils";
 
 const form = useForm({
     name: "",
@@ -15,11 +15,13 @@ const form = useForm({
     password: "",
     password_confirmation: "",
 });
-const { formatPhoneNumber } = useAppointmentForm();
+
 const passwordVisible = ref(false);
 const passwordVisibleTwo = ref(false);
 
 const submit = () => {
+    form.fone = form.fone.replace(/\D/g, "");
+    
     form.post(route("register"), {
         onFinish: () => {
             form.reset("password", "password_confirmation");
@@ -91,7 +93,7 @@ const validatePasswordConfirmation = (): void => {
                     v-model="form.fone"
                     @input="
                         form.errors.fone = undefined;
-                        formatPhoneNumber();
+                        form.fone = formatPhoneNumber(form.fone);
                     "
                     placeholder="DD Número"
                     required
