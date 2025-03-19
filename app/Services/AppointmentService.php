@@ -9,13 +9,13 @@ class AppointmentService
 {
     private static function getEnvConfig()
     {
-        return [
-            'start_exp' => env('INICIO_EXP', '09:00'),
-            'end_exp' => env('FIM_EXP', '17:00'),
-            'lunch_start' => env('INTERVALO_ALMOCO_INICIO', '12:00'),
-            'lunch_end' => env('INTERVALO_ALMOCO_FIM', '14:00'),
-            'duration_cut' => (int) env('DURACAO_CORTE', 60),
-        ];
+        return config('appointment', [
+            'start_exp' => '09:00',
+            'end_exp' => '19:00',
+            'lunch_start' => '12:00',
+            'lunch_end' => '13:00',
+            'duration_cut' => 40,
+        ]);
     }
     // Função para gerar lista de horários baseados no expediente, excluindo almoço
     private static function generateHoursList(string $selectedDate): array
@@ -51,7 +51,7 @@ class AppointmentService
 
     public static function generateAvailableTimes(string $selectedDate): array
     {
-    
+
         if (!$selectedDate || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
             throw new \InvalidArgumentException('Data inválida');
         }
@@ -87,7 +87,7 @@ class AppointmentService
             $isPast = $isToday && $currentTime < $now;
             return !$isBooked && !$isPast;
         });
-        return array_values($filtered); 
+        return array_values($filtered);
     }
 
 
@@ -108,5 +108,11 @@ class AppointmentService
             'reservations' => $reservations,
             'quantityReservations' => $quantityReservations,
         ];
+    }
+
+    public static function getAvailableTimesForToday()
+    {
+        $date = now()->toDateString();
+        return self::generateAvailableTimes($date);
     }
 }

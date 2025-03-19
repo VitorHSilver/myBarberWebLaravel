@@ -48,7 +48,7 @@ export default {
     			]
     		},
     		screens: {
-    			smallscreen: '360px'
+    			smallscreen: '350px'
     		},
     		minWidth: {
     			'40vh': '40vh'

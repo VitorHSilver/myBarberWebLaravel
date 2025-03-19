@@ -1,9 +1,22 @@
 import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import { useForm } from "@inertiajs/vue3";
-import axios from "axios";
+import { formatPhoneNumber } from "@/utils/phoneUtils";
+import { fetchTimeSlots } from "@/services/appointmentService";
+import { useDateValidation } from "@/composables/useDateValidation";
 
-export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
+export function useAppointmentForm(
+    props: {
+        timesSlot?: string[];
+        initialData?: {
+            name: string;
+            email: string;
+            fone: string;
+            date: string;
+            time: string;
+        };
+    } = {}
+) {
     const currentDate = new Date().toLocaleDateString("en-CA");
     const showTimeSelect = ref(false);
     const notificationError = ref(false);
@@ -11,110 +24,54 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
     const showVideo = ref(true);
     const toast = useToast();
     const dateInput = ref<HTMLInputElement | null>(null);
-    const isDateValid = ref(true);
+
+    const { isDateValid, checkDate } = useDateValidation();
 
     const form = useForm({
-        name: "",
-        email: "",
-        fone: "",
-        date: currentDate,
-        time: "",
+        name: props.initialData?.name || "",
+        email: props.initialData?.email || "",
+        fone: props.initialData?.fone || "",
+        date: props.initialData?.date || currentDate,
+        time: props.initialData?.time || "",
     });
 
-    const formatPhoneNumber = () => {
-        let fone = form.fone.replace(/\D/g, "");
-        if (fone.length > 11) {
-            fone = fone.slice(0, 11);
-            dateInput.value?.focus();
-        }
-        if (fone.length === 11) {
-            form.fone = `(${fone.slice(0, 2)}) ${fone.slice(2, 7)}-${fone.slice(
-                7
-            )}`;
-        } else if (fone.length === 10) {
-            form.fone = `(${fone.slice(0, 2)}) ${fone.slice(2, 6)}-${fone.slice(
-                6
-            )}`;
-        } else {
-            form.fone = fone;
-        }
+    const formatPhone = (): void => {
+        form.fone = formatPhoneNumber(form.fone);
     };
 
-    const cleanField = () => {
+    const cleanField = (): void => {
         form.reset();
         form.date = currentDate;
         isDateValid.value = true;
     };
 
-    const isBusinessDay = async (dateString: string): Promise<boolean> => {
-        try {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) {
-                throw new Error("Data inválida fornecida");
-            }
-
-            const year = date.getFullYear();
-            const response = await axios.get(
-                `https://brasilapi.com.br/api/feriados/v1/${year}`
-            );
-            const holidays = response.data;
-            const holidayDates = holidays.map(
-                (item: { date: string }) => item.date
-            );
-
-            const dayOfWeek = date.getDay();
-            const formattedDate = date.toISOString().split("T")[0];
-
-            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-            const isHoliday = holidayDates.includes(formattedDate);
-
-            return !isWeekend && !isHoliday;
-        } catch (error) {
-            console.error("Erro ao verificar dia útil:", error);
-            return false;
-        }
-    };
-
-    const fetchTimeSlots = async (date: string) => {
-        try {
-            const response = await axios.get(`/free-times?date=${date}`);
-            timesSlot.value = response.data.times; // Atualiza timesSlot com os horários retornados
-        } catch (error) {
-            console.error("Erro ao buscar horários:", error);
-            timesSlot.value = []; // Em caso de erro, limpa os horários
-        }
-    };
-    const checkDate = async (event: Event) => {
-        const target = event.target as HTMLInputElement;
-        form.date = target.value;
-
-        const currentDate = new Date().toISOString().split("T")[0];
-
-        if (target.value < currentDate) {
-            toast.add({
-                severity: "error",
-                summary: "Erro",
-                detail: "Data inválida.",
-                life: 3000,
-            });
-            showTimeSelect.value = false;
-            isDateValid.value = false;
+    const validateAndFetchTimeSlots = async (date: string | Date) => {
+        let dateString: string;
+        if (date instanceof Date) {
+            dateString = date.toISOString().split("T")[0];
+        } else if (typeof date === "string") {
+            dateString = date;
         } else {
-            const isValidBusinessDay = await isBusinessDay(target.value);
-            if (!isValidBusinessDay) {
-                toast.add({
-                    severity: "error",
-                    summary: "Erro",
-                    detail: "A data selecionada não é um dia útil.",
-                    life: 3000,
-                });
-                showTimeSelect.value = false;
-                isDateValid.value = false;
-            } else {
-                await fetchTimeSlots(target.value);
+            console.error("Formato de data inválido:", date);
+            return;
+        }
+        form.date = dateString;
+        try {
+            const isValid = await checkDate(dateString, toast);
+         
+            if (isValid) {
+                const slots = await fetchTimeSlots(dateString);
+                timesSlot.value = slots;
                 showTimeSelect.value = true;
-                isDateValid.value = true;
+            } else {
+                console.log("Data inválida, horários não serão carregados.");
+                showTimeSelect.value = false;
+                timesSlot.value = [];
             }
+        } catch (error) {
+            console.error("Erro ao validar ou buscar horários:", error);
+            showTimeSelect.value = false;
+            timesSlot.value = [];
         }
     };
 
@@ -129,8 +86,8 @@ export function useAppointmentForm(props: { timesSlot?: string[] } = {}) {
         timesSlot,
         showTimeSelect,
         notificationError,
-        formatPhoneNumber,
-        checkDate,
+        formatPhone,
+        validateAndFetchTimeSlots,
         cleanField,
         showVideo,
         dateInput,

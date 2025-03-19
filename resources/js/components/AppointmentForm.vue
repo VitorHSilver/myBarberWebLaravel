@@ -2,26 +2,19 @@
 import { useToast } from "primevue/usetoast";
 import { useAppointmentForm } from "@/composables/useAppointmentForm";
 import { Button } from "@/components/ui/button";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import InputError from "@/Components/InputError.vue";
-
-const isSubmitting = ref(false);
 
 const {
     form,
     showTimeSelect,
     notificationError,
-    formatPhoneNumber,
-    checkDate,
+    formatPhone,
+    validateAndFetchTimeSlots,
     cleanField,
     dateInput,
-    isDateValid,
     timesSlot,
 } = useAppointmentForm();
-
-const isButtonDisabled = computed(() => {
-    return !isDateValid.value;
-});
 
 const toast = useToast();
 const buttonInput = ref<HTMLInputElement | null>(null);
@@ -32,7 +25,7 @@ const handleSubmit = async () => {
         setTimeout(() => (notificationError.value = false), 3000);
         return;
     }
-    isSubmitting.value = true;
+
     form.post("/appointments", {
         onSuccess: () => {
             cleanField();
@@ -42,6 +35,7 @@ const handleSubmit = async () => {
                 detail: "Para alterar a data do agendamento, por favor, crie uma conta.",
                 life: 5000,
             });
+            
         },
         onError: () => {
             toast.add({
@@ -51,7 +45,6 @@ const handleSubmit = async () => {
                 life: 3000,
             });
         },
-        onFinish: () => (isSubmitting.value = false),
     });
 };
 </script>
@@ -59,7 +52,7 @@ const handleSubmit = async () => {
 <template>
     <form
         @submit.prevent="handleSubmit"
-        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[16rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 md:mt-24 max-smallscreen:shadow-none md:ml-8 max-md:grid max-md:gap-4 max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl"
+        class="flex flex-col md:flex-row border-2 md:max-w-[21rem] max-md:max-w-[24rem] max-md:p-4 border-gray-100 items-center gap-8 pr-1 pl-2 mb-4 max-smallscreen:border-none max-smallscreen:mt-16 max-lg:mt-0 max-lg:mb-8 xl:mt-24 max-xl:mt-22 max-smallscreen:shadow-none md:ml-32 max-md:grid max-md:gap-4 md:max-md:items-start py-2 animate-slide-in opacity-0 animate-12 rounded-3xl max-md:m-auto"
     >
         <div class="grid gap-4 p-2 max-sm:p-0 max-sm:gap-2 max-md:w-full">
             <h3
@@ -70,37 +63,38 @@ const handleSubmit = async () => {
             <div>
                 <input
                     type="text"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 input relative"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-smallscreen:mt-2 max-sm:mb-1 input relative"
                     placeholder="Nome"
+                    autofocus
                     v-model="form.name"
                     @input="form.errors.name = undefined"
                     aria-label="Nome"
-                    autocomplete="given-name"
+                    autocomplete="username"
                 />
                 <InputError :message="form.errors.name" />
             </div>
             <div>
                 <input
                     type="email"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-sm:mb-1"
                     placeholder="Email"
                     v-model="form.email"
                     @input="form.errors.email = undefined"
                     aria-label="Email"
-                    autocomplete="email"
+                    autocomplete="username"
                 />
                 <InputError :message="form.errors.email" />
             </div>
             <div>
                 <input
                     type="text"
-                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50"
+                    class="w-full bg-transparent border border-gray-100/60 pl-2 mr-2 rounded-md outline-none ring-1 ring-gray-200/80 py-1 placeholder:text-gray-50 max-sm:mb-1"
                     placeholder="DD + número"
                     v-model="form.fone"
                     aria-label="Fone"
                     @input="
                         form.errors.fone = undefined;
-                        formatPhoneNumber();
+                        formatPhone();
                     "
                 />
                 <InputError :message="form.errors.fone" />
@@ -111,8 +105,8 @@ const handleSubmit = async () => {
                     type="date"
                     class="date-input flex-grow bg-transparent border border-gray-100/60 pl-2 mr-1 rounded-md outline-none ring-1 ring-gray-200/80 py-1 data-checked:underline text-gray-50 max-md:w-full"
                     v-model="form.date"
-                    @change="checkDate"
-                    @focus="checkDate"
+                    @change="validateAndFetchTimeSlots(form.date)"
+                    @focus="validateAndFetchTimeSlots(form.date)"
                     ref="dateInput"
                 />
                 <div v-show="showTimeSelect" class="block flex-grow">
@@ -121,10 +115,10 @@ const handleSubmit = async () => {
                         v-model="form.time"
                         aria-label="Horario"
                     >
+                        <option disabled value="">Horarios</option>
                         <option v-if="timesSlot.length === 0" disabled>
                             Nenhum horário disponível
                         </option>
-                        <option disabled value="">Horarios</option>
                         <option
                             v-for="times in timesSlot"
                             :key="times"
@@ -138,10 +132,10 @@ const handleSubmit = async () => {
             <Button
                 ref="buttonInput"
                 class="bg-marrom-500 hover:bg-marrom-600 rounded-md border border-gray-200 max-md:mb-2 text-lg"
-                :disabled="isButtonDisabled || isSubmitting"
                 aria-label="Confirmar agendamento"
+                :disabled="form.processing"
             >
-                {{ isSubmitting ? "Enviando..." : "Confirmar" }}
+                {{ form.processing ? "Enviando..." : "Confirmar" }}
             </Button>
             <Transition name="slide-fade">
                 <span

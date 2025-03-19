@@ -2,47 +2,72 @@
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfessionalController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Agenda', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [AppointmentController::class, 'index'])->name('home');
+Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/appointments', [AppointmentController::class, 'show'])->name('appointments.show');
+Route::get('/appointment/{id}', [AppointmentController::class, 'edit'])->name('appointment.edit');
+Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
-Route::middleware('auth')->group(function () {
+// Redireciona para a dashboard correta com base no role
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        /** @var \Illuminate\Contracts\Auth\Guard $auth */
+        $auth = auth();
+        /** @var User|null $user */
+        $user = $auth->user();
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isProfessional()) {
+            return redirect()->route('professional.dashboard');
+        } else {
+            return redirect()->route('user.dashboard');
+        }
+    })->name('dashboard');
+
+    // Rotas do Admin
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/admin/professionals', [AdminController::class, 'listProfessionals'])->name('admin.professionals');
+        Route::post('/admin/professionals', [AdminController::class, 'storeProfessional'])->name('admin.professionals.store');
+        Route::put('/admin/professionals/{id}', [AdminController::class, 'updateProfessional'])->name('admin.professionals.update');
+        Route::delete('/admin/professionals/{id}', [AdminController::class, 'destroyProfessional'])->name('admin.professionals.destroy');
+    });
+
+    // Rotas do Profissional
+    Route::middleware('professional')->group(function () {
+        Route::get('/professional/dashboard', [ProfessionalController::class, 'index'])->name('professional.dashboard');
+        Route::delete('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    });
+
+    // Rotas do Usuário
+    Route::middleware('auth')->group(function () {
+        Route::get('/user/dashboard', [AppointmentController::class, 'userDashboard'])->name('user.dashboard');
+        Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
+    });
+
+    // Rotas de Perfil (já incluso no Laravel Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
-// Appointment
-Route::get('/user', function (Request $request) {
+Route::get('/user', function (Illuminate\Http\Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::post('/logout', function () {
+    /** @var \Illuminate\Support\Facades\Auth $auth */
+    $auth = auth();
+    $auth->logout();
+    return redirect('/login');
+})->name('logout');
 
-Route::get('/', [AppointmentController::class, 'index'])->name('home');
-Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->name('appointments.show');
-Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
-Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
+Route::get('/auth/google', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback']);
 
-
-// Rota para buscar horários disponíveis 
-Route::get('/free-times', [AppointmentController::class, 'getAvailableTimes'])->name('free-times');
-
-// Rota para buscar reservas do dia (pode ser mantida como API ou passada via props)
-Route::get('/reserved-times', [AppointmentController::class, 'getReservationsOfDay'])->name('reserved-times');
 require __DIR__ . '/auth.php';

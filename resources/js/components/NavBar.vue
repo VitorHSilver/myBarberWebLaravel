@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { router, usePage } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 
 const isMenuVisible = ref(false);
@@ -9,6 +9,7 @@ function toggleMenu() {
 }
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+
 const isHomePage = computed(() => page.component === "Agenda");
 
 const navLinks = [
@@ -19,8 +20,8 @@ const navLinks = [
         ariaLabel: "Ir para a página inicial",
         animation: "animate-1",
         order: "",
+        fav: null,
         onClick: toggleMenu,
-        fav: "",
     },
     {
         label: "Serviços",
@@ -30,7 +31,6 @@ const navLinks = [
         animation: "animate-1",
         order: "",
         onClick: toggleMenu,
-        fav: "", // Sem ícone por enquanto
     },
     {
         label: "Sobre",
@@ -51,7 +51,7 @@ const navLinks = [
         onClick: toggleMenu,
     },
     {
-        label: "Conta",
+        label: "Login",
         href: route("login"),
         condition: () => user.value === null,
         ariaLabel: "Fazer login",
@@ -60,12 +60,13 @@ const navLinks = [
         onClick: toggleMenu,
     },
     {
-        label: "Sair",
-        href: route("logout"),
+        label: user.value !== null ? user.value.name : "Minha conta",
+        href: route("dashboard"),
         condition: () => user.value !== null,
-        ariaLabel: "Sair da conta",
+        ariaLabel: "tela de Dashboard",
         animation: "animate-4",
-        order: "max-md:order-[-1]",
+        fav: null,
+        onClick: () => {},
     },
 ];
 const filteredNavLinks = computed(() =>
@@ -76,7 +77,7 @@ const filteredNavLinks = computed(() =>
 <template>
     <div class="container">
         <header
-            class="grid grid-cols-2 mt-6 items-center max-md:flex max-md:justify-around"
+            class="grid grid-cols-2 mt-6 items-center max-md:flex max-md:justify-around max-smallscreen:flex max-smallscreen:min-w-96"
         >
             <a href="./">
                 <img
@@ -120,12 +121,7 @@ const filteredNavLinks = computed(() =>
                             :href="link.href"
                             :aria-label="link.ariaLabel"
                         >
-                            <img
-                                v-if="link.fav"
-                                :src="link.fav"
-                                alt="ícone"
-                                class="w-5 h-5"
-                            />
+                            <img v-if="link.fav" alt="ícone" class="w-5 h-5" />
                             <span>{{ link.label }}</span>
                         </a>
                     </li>
@@ -153,8 +149,44 @@ const filteredNavLinks = computed(() =>
     max-width: 400px;
     max-height: 200px;
 }
-ul :nth-child(4) {
+
+/* Remover o sublinhado do último link */
+ul li:last-child a::after {
+    content: none !important;
+}
+@media (max-width: 767px) {
+    ul {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
+/* Estilização específica para o quarto link (Login ou Minha Conta) */
+ul li:nth-child(4) a {
     margin-left: 20%;
+}
+
+@media (min-width: 768px) {
+    ul li:nth-child(4) a {
+        transition: all 0.5s ease;
+        color: #fff;
+        border: 3px solid white;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 1;
+        font-size: 17px;
+        background-color: transparent;
+        padding: 10px;
+        outline: none;
+        border-radius: 4px;
+        margin-left: 0%;
+        letter-spacing: 0.4rem;
+    }
+
+    ul li:nth-child(4) a:hover {
+        color: #451e0e;
+        background-color: #fff;
+    }
 }
 @media (max-width: 1160px) {
     ul :nth-child(4) {
@@ -168,6 +200,11 @@ ul :nth-child(4) {
 }
 @media (max-width: 878px) {
     ul :nth-child(4) {
+        margin-left: 0%;
+    }
+}
+@media (max-width: 768px) {
+    ul li:nth-child(4) a {
         margin-left: 0%;
     }
 }

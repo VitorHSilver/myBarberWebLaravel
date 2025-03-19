@@ -1,34 +1,59 @@
 <script setup lang="ts">
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import GuestLayout from "@/Layouts/GuestLayout2.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { formatPhoneNumber } from "@/utils/phoneUtils";
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: "",
+    email: "",
+    fone: "",
+    password: "",
+    password_confirmation: "",
 });
 
+const passwordVisible = ref(false);
+const passwordVisibleTwo = ref(false);
+
 const submit = () => {
-    form.post(route('register'), {
+    form.fone = form.fone.replace(/\D/g, "");
+    
+    form.post(route("register"), {
         onFinish: () => {
-            form.reset('password', 'password_confirmation');
+            form.reset("password", "password_confirmation");
+        },
+        onError: (erro) => {
+            console.log(erro);
         },
     });
+};
+
+const validatePasswordConfirmation = (): void => {
+    if (form.password && form.password_confirmation) {
+        if (form.password !== form.password_confirmation) {
+            form.errors.password_confirmation = "As senhas não coincidem.";
+        } else if (form.password_confirmation !== form.password) {
+            form.errors.password_confirmation = "As senhas não coincidem.";
+        } else {
+            form.errors.password_confirmation = "";
+        }
+    } else {
+        form.errors.password_confirmation = "";
+    }
 };
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Register" />
+        <Head title="Cadastro" />
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Nome" />
 
                 <TextInput
                     id="name"
@@ -59,37 +84,84 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="fone" value="Telefone" />
+
+                <TextInput
+                    id="fone"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.fone"
+                    @input="
+                        form.errors.fone = undefined;
+                        form.fone = formatPhoneNumber(form.fone);
+                    "
+                    placeholder="DD Número"
+                    required
+                    autocomplete="phone"
+                />
+
+                <InputError class="mt-2" :message="form.errors.fone" />
+            </div>
+
+            <div class="mt-4 relative">
+                <InputLabel for="password" value="Senha" />
 
                 <TextInput
                     id="password"
-                    type="password"
+                    :type="passwordVisible ? 'text' : 'password'"
                     class="mt-1 block w-full"
                     v-model="form.password"
+                    @change="validatePasswordConfirmation"
                     required
                     autocomplete="new-password"
                 />
+                <div class="absolute top-8 right-2">
+                    <img
+                        :src="
+                            passwordVisible
+                                ? 'icon/eye.svg'
+                                : 'icon/eye_off.svg'
+                        "
+                        class="cursor-pointer"
+                        @click="passwordVisible = !passwordVisible"
+                    />
+                </div>
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                <InputError
+                    class="mt-2 font-bold"
+                    :message="form.errors.password"
+                />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4 relative">
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    value="Confirme sua Senha"
                 />
 
                 <TextInput
                     id="password_confirmation"
-                    type="password"
+                    :type="passwordVisibleTwo ? 'text' : 'password'"
                     class="mt-1 block w-full"
                     v-model="form.password_confirmation"
                     required
                     autocomplete="new-password"
+                    @change="validatePasswordConfirmation"
                 />
+                <div class="absolute top-8 right-2">
+                    <img
+                        :src="
+                            passwordVisibleTwo
+                                ? 'icon/eye.svg'
+                                : 'icon/eye_off.svg'
+                        "
+                        class="cursor-pointer"
+                        @click="passwordVisibleTwo = !passwordVisibleTwo"
+                    />
+                </div>
 
                 <InputError
-                    class="mt-2"
+                    class="mt-2 font-bold"
                     :message="form.errors.password_confirmation"
                 />
             </div>
@@ -99,7 +171,7 @@ const submit = () => {
                     :href="route('login')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Already registered?
+                    Já tem uma conta?
                 </Link>
 
                 <PrimaryButton
@@ -113,3 +185,10 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
+<style scoped>
+input:focus {
+    border-color: gray;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+</style>
