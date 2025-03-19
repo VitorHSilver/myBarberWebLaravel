@@ -15,7 +15,7 @@ const props = defineProps<{
 const toast = useToast();
 
 const form = useForm<{
-    date: string | Date;
+    date: Date;
     time: string;
     name: string;
     email: string;
@@ -44,27 +44,10 @@ onMounted(() => {
 });
 
 const submitForm = () => {
-    // Formata a data para YYYY-MM-DD
-    let dateString = "";
-    if (form.date instanceof Date) {
-        const year = form.date.getFullYear();
-        const month = String(form.date.getMonth() + 1).padStart(2, "0");
-        const day = String(form.date.getDate()).padStart(2, "0");
-        dateString = `${year}-${month}-${day}`;
-    } else if (typeof form.date === "string") {
-        dateString = form.date.split("T")[0];
-    } else {
-        console.error("Formato inválido para form.date:", form.date);
-        toast.add({
-            severity: "error",
-            summary: "Erro",
-            detail: "Formato de data inválido.",
-            life: 3000,
-        });
-        return;
-    }
+    const dateString = form.date.toISOString().split("T")[0];
 
-    form.date = dateString;
+    // Atualiza o form.date para ser uma string
+    form.date = dateString as any; // Temporariamente usamos 'as any' para evitar conflito de tipo
 
     form.put(route("appointments.update", props.appointment.id), {
         onSuccess: () => {
@@ -86,11 +69,10 @@ const submitForm = () => {
         },
     });
 };
-const formatDatePtBr = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0"); // Usa getDate() para o dia local
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() é 0-based
-    const year = date.getFullYear(); // Usa getFullYear() para o ano local
+const formatDatePtBr = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
     return `${day}/${month}/${year}`;
 };
 </script>
