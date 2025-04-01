@@ -2,6 +2,7 @@
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Link } from "@inertiajs/vue3";
 import { onMounted, onUnmounted, ref } from "vue";
+import Carousel from "primevue/carousel";
 
 const isSmallScreen = ref(false);
 
@@ -15,16 +16,65 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener("resize", updateScreenSize);
 });
+
+const images = ref([
+    {
+        url: "carousel/foto1.jpg",
+        name: "barbearia",
+    },
+    {
+        url: "carousel/foto2.png",
+        name: "corte",
+    },
+    {
+        url: "carousel/foto3.jpg",
+        name: "objetos",
+    },
+    {
+        url: "carousel/foto4.png",
+        name: "corte",
+    },
+    {
+        url: "carousel/foto5.jpg",
+        name: "corte",
+    },
+    {
+        url: "carousel/foto6.png",
+        name: "corte",
+    },
+]);
 </script>
 
 <template>
-    <div class="md:grid grid-cols-[1200px_auto]">
-        <div v-if="!isSmallScreen" class="flex items-center">
-            <img src="/barber-high-resolution-logo-transparent.svg" alt="" />
+    <div
+        class="lg:grid grid-cols-[1200px_1fr] max-lg:flex flex-col h-screen bg-white"
+    >
+        <div
+            v-if="!isSmallScreen"
+            class="h-screen flex justify-center items-center bg-white"
+        >
+            <Carousel
+                :value="images"
+                :numVisible="2"
+                :numScroll="1"
+                :autoplayInterval="5000"
+                class="custom-carousel"
+            >
+                <template #item="slotProps">
+                    <div class="w-full h-full">
+                        <img
+                            :src="slotProps.data.url"
+                            :alt="slotProps.data.name || 'Carousel Image'"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                    
+                </template>
+            </Carousel>
         </div>
 
         <div
-            class="flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0 bg-white"
+            class="flex min-h-screen min-w-96 flex-col items-center pt-6 sm:justify-center sm:pt-0 bg-white max-md:mt-14"
         >
             <div>
                 <Link href="/">
@@ -42,3 +92,12 @@ onUnmounted(() => {
         </div>
     </div>
 </template>
+
+<style scoped>
+
+ul.p-link {
+    background-color: purple;
+}
+
+
+</style>

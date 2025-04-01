@@ -8,10 +8,24 @@ import FloatLabel from "primevue/floatlabel";
 import InputText from "primevue/inputtext";
 import { onMounted, ref } from "vue";
 
+
 defineProps<{
     canResetPassword?: boolean;
     status?: string;
 }>();
+
+const images = [
+    {
+        url: "carousel/foto1.jpg",
+    },
+    {
+        url: "carousel/foto2.jpg",
+    },
+    {
+        url: "carousel/foto3.jpg",
+    },
+];
+
 
 const form = useForm({
     email: "",
