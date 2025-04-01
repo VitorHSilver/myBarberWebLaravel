@@ -68,7 +68,6 @@ const images = ref([
                             class="w-full h-full object-cover"
                         />
                     </div>
-                    
                 </template>
             </Carousel>
         </div>
@@ -93,11 +92,8 @@ const images = ref([
     </div>
 </template>
 
-<style scoped>
-
-ul.p-link {
-    background-color: purple;
+<style>
+.p-carousel-indicator-active .p-carousel-indicator-button {
+    background-color: #4b5563 !important;
 }
-
-
 </style>
