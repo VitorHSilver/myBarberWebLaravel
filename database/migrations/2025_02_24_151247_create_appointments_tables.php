@@ -19,13 +19,13 @@ return new class extends Migration
             $table->date('date');
             $table->time('time');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('professional_id')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->timestamps();
+            $table->unique(['professional_id', 'date', 'time']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('appointments');

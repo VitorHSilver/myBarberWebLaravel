@@ -13,7 +13,7 @@ Route::get('/appointments', [AppointmentController::class, 'show'])->name('appoi
 Route::get('/appointment/{id}', [AppointmentController::class, 'edit'])->name('appointment.edit');
 Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
-// Redireciona para a dashboard correta com base no role
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         /** @var \Illuminate\Contracts\Auth\Guard $auth */
@@ -29,28 +29,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('dashboard');
 
-    // Rotas do Admin
+
     Route::middleware('admin')->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/professionals', [AdminController::class, 'listProfessionals'])->name('admin.professionals');
+        Route::get('/admin/users', [AdminController::class, 'getAllUsers'])->name('admin.getAllUsers');
         Route::post('/admin/professionals', [AdminController::class, 'storeProfessional'])->name('admin.professionals.store');
         Route::put('/admin/professionals/{id}', [AdminController::class, 'updateProfessional'])->name('admin.professionals.update');
         Route::delete('/admin/professionals/{id}', [AdminController::class, 'destroyProfessional'])->name('admin.professionals.destroy');
     });
 
-    // Rotas do Profissional
+
     Route::middleware('professional')->group(function () {
         Route::get('/professional/dashboard', [ProfessionalController::class, 'index'])->name('professional.dashboard');
         Route::delete('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
     });
 
-    // Rotas do Usuário
     Route::middleware('auth')->group(function () {
         Route::get('/user/dashboard', [AppointmentController::class, 'userDashboard'])->name('user.dashboard');
         Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
     });
 
-    // Rotas de Perfil (já incluso no Laravel Breeze)
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

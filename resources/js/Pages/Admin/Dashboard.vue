@@ -40,17 +40,18 @@ const getMenuItems = () => {
                 icon: "pi pi-cog",
                 items: [
                     {
-                        label: "Adicionar",
+                        label: "Listar Usuários",
                         icon: "pi pi-user-plus",
+                        route: route("admin.getAllUsers")
                     },
-                    {
-                        label: "Alterar função",
-                        icon: "pi pi-user-edit",
-                    },
-                    {
-                        label: "Mostrar Todos",
-                        icon: "pi pi-users",
-                    },
+                    // {
+                    //     label: "Alterar função",
+                    //     icon: "pi pi-user-edit",
+                    // },
+                    // {
+                    //     label: "Mostrar Todos",
+                    //     icon: "pi pi-users",
+                    // },
                 ],
             },
             {

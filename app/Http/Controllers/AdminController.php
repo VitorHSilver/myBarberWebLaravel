@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+use function Pest\Laravel\json;
+
 class AdminController extends Controller
 {
     public function index()
@@ -30,7 +32,13 @@ class AdminController extends Controller
             'professionals' => $professionals,
         ]);
     }
-
+    public function getAllUsers()
+    {
+        $users = User::select('name', 'email', 'role')->get();
+        return inertia('Admin/UsersTile', [
+            'users' => $users,
+        ]);
+    }
     public function storeProfessional(Request $request)
     {
         if (!Gate::allows('manage-professionals', Auth::user())) {

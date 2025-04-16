@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AppointmentRequest;
+
+use App\Http\Requests\AppointmentRequestStore;
+use App\Http\Requests\AppointmentRequestUpdate;
 use App\Models\Appointment;
 use App\Models\User;
 use App\Services\AppointmentService;
@@ -52,9 +54,10 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function store(AppointmentRequest $request)
+    public function store(AppointmentRequestStore $request)
     {
         try {
+            // Obtém o ID do usuário autenticado, se houver
             $userId = Auth::id();
 
             if (!$userId) {
@@ -62,13 +65,28 @@ class AppointmentController extends Controller
                 $userId = $user ? $user->id : null;
             }
 
-            Appointment::create([
+            // Valida o professional_id (deve ser enviado pelo frontend)
+            $professionalId = $request->input('professional_id');
+            if (!$professionalId) {
+                throw new \Exception('Profissional não selecionado.');
+            }
+
+            
+            $professional = User::where('id', $professionalId)->where('role', 'professional')->first();
+            if (!$professional) {
+                throw new \Exception('Profissional inválido.');
+            }
+
+            
+            $appointment = Appointment::create([
                 'name' => ucwords(strtolower($request->name)),
                 'email' => strtolower($request->email),
                 'fone' => $request->fone,
                 'date' => $request->date,
                 'time' => $request->time,
                 'user_id' => $userId,
+                'professional_id' => $professionalId,
+                'status' => 'pending', 
             ]);
 
             return redirect()->back()->with('success', 'Consulta marcada!');
@@ -82,7 +100,7 @@ class AppointmentController extends Controller
         }
     }
 
-    public function update(AppointmentRequest $request, $id)
+    public function update(AppointmentRequestUpdate $request, $id)
     {
         try {
             $appointment = Appointment::findOrFail($id);
@@ -105,13 +123,11 @@ class AppointmentController extends Controller
                 'date' => $request->date,
                 'time' => $request->time,
                 'user_id' => $userId ?? $appointment->user_id,
+                'professional_id' => $request->professional_id,
+                'status' => $request->status ?? $appointment->status, 
             ]);
 
             return redirect()->back()->with('success', 'Consulta atualizada com sucesso!');
-        } catch (ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->validator->errors())
-                ->withInput();
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar agendamento: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Erro ao atualizar agendamento.');

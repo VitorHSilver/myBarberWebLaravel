@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class AppointmentRequest extends FormRequest
+class AppointmentRequestStore extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +23,16 @@ class AppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:2|max:255',
-            'email' => 'required|email',
-            'fone' => ['required', 'regex:/^\d{10,11}$/'],
-            'date' => 'required|date|after_or_equal:today',
-            'time' => 'required|date_format:H:i',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'fone' => ['required', 'string', 'max:20'], // Ajuste o tamanho conforme necessário
+            'date' => ['required', 'date', 'after_or_equal:today'],
+            'time' => ['required', 'date_format:H:i'],
+            'professional_id' => [
+                'required',
+                'exists:users,id', // Garante que o ID existe na tabela users
+                Rule::exists('users', 'id')->where('role', 'professional'), // Garante que o usuário é um profissional
+            ],
         ];
     }
     public function messages(): array
@@ -42,6 +48,8 @@ class AppointmentRequest extends FormRequest
             'time.required' => 'O horário é obrigatório.',
             'email.required' => 'O email é obrigatório.',
             'email.email' => 'Insira um email válido.',
+             'professional_id.required' => 'Você deve selecionar um profissional.',
+            'professional_id.exists' => 'O profissional selecionado não existe ou não é válido.'
         ];
     }
     protected function prepareForValidation()
