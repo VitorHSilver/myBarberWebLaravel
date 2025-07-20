@@ -21,7 +21,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'fone'
+        'fone',
+        'avatar'
     ];
 
     /**
@@ -44,8 +45,28 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'avatar' => 'array',
         ];
     }
+
+        /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'avatar_url',
+    ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if ($this->avatar && isset($this->avatar['path'])) {
+            return asset('storage/' . $this->avatar['path']);
+        }
+
+        return null;
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import Avatar from "@/components/Avatar.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Link, useForm, usePage } from "@inertiajs/vue3";
 
 defineProps<{
     mustVerifyEmail?: Boolean;
@@ -15,12 +16,23 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    avatar: null as File | null,
 });
+
+const handleSubmit = () => {
+    form.transform((data) => ({
+        ...data,
+        _method: "PATCH",
+    })).post(route("profile.update"), {
+        forceFormData: true,
+    });
+};
 </script>
 
 <template>
     <section>
         <header>
+            <Avatar v-model="form.avatar" :image-url="user.avatar_url" />
             <h2 class="text-lg font-medium text-gray-900">
                 Profile Information
             </h2>
@@ -30,10 +42,7 @@ const form = useForm({
             </p>
         </header>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
-        >
+        <form @submit.prevent="handleSubmit" class="mt-6 space-y-6">
             <div>
                 <InputLabel for="name" value="Name" />
 
